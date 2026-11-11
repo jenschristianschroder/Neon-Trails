@@ -18,6 +18,7 @@
 @media(max-width:680px){.intro h1{font-size:clamp(43px,14vw,62px)}}
 #safe-frame{position:fixed;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);pointer-events:none;visibility:hidden}
 @media(max-width:680px){.menu{padding-top:max(18px,env(safe-area-inset-top,0px))}}
+.player-panel{background:linear-gradient(#080f18b3,transparent 78px,transparent calc(100% - 44px),#080f18a8)}.player-top{filter:drop-shadow(0 1px 4px #000)}.pad{background:radial-gradient(circle,#0b202608,#08121d18);border-color:color-mix(in srgb,var(--player) 36%,transparent);box-shadow:none}.pad:before{border-color:color-mix(in srgb,var(--player) 18%,transparent)}.pad:after{background:transparent;border-color:#ffffff18}.pad.held{background:#08121d0a;box-shadow:0 0 24px color-mix(in srgb,var(--player) 7%,transparent)}.knob{background:color-mix(in srgb,var(--player) 12%,transparent);box-shadow:0 0 12px #08121d33}.pad-label{color:#a6c1cd90;text-shadow:0 1px 5px #000}.player-status{text-shadow:0 1px 5px #000}.mini-map{position:absolute;pointer-events:none}.round-message{z-index:3}.ready{z-index:4}
 </style>
 </head>
 <body>
@@ -32,14 +33,14 @@
 </main>
 <div id="game" hidden><div id="panels"></div><div class="game-toolbar" id="game-toolbar" data-ui><button class="icon-button" id="pause-button" aria-label="Pause game"></button><button class="icon-button" id="sound-game" aria-label="Turn sound on"></button><button class="icon-button" id="fullscreen" aria-label="Toggle fullscreen"></button></div></div>
 <div class="overlay" id="pause" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title"><div class="eyebrow">THE GRID CAN WAIT.</div><h2 id="pause-title">Take a breath.</h2><p>Your round is paused. Place a fresh finger on the circle when you return.</p><button class="launch" id="resume">BACK TO THE GRID <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><button class="secondary" id="restart">Restart match</button><button class="secondary" id="home">Return to menu</button></section></div>
-<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Drive the bright head of your trail. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = stop.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. You can stop as long as you like, but the boundary begins closing after 12 seconds. Keep an escape route toward the center.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Face-to-face rotates the complete views and controls toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
+<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = stop.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. You can stop as long as you like, but the boundary begins closing after 12 seconds. Keep an escape route toward the center.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your camera follows your particle across a larger arena. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
   const canvas = $('scene'), ctx = canvas.getContext('2d', {alpha:false});
-  const W = 720, H = 480, R = 6, TRAIL = 4, CELL = 32, STEP = 1/120, SPEED = 119;
+  const W = 1536, H = 1152, R = 7, TRAIL = 12, CELL = 32, STEP = 1/120, SPEED = 119;
   const COLORS = ['#4ee9ef','#ff977e','#ba9aff','#f1cf7d'];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
   const angleDelta = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -49,7 +50,7 @@
     {name:'Open Circuit',detail:'Room to think. Space to trap.',obstacles:[]},
     {name:'The Divide',detail:'Two pillars. A tempting shortcut.',obstacles:[{x:244,y:158,w:62,h:164},{x:414,y:158,w:62,h:164}]},
     {name:'Cross Current',detail:'Four corners. Keep the center open.',obstacles:[{x:186,y:116,w:88,h:46},{x:446,y:116,w:88,h:46},{x:186,y:318,w:88,h:46},{x:446,y:318,w:88,h:46}]}
-  ];
+  ].map(map=>({...map,obstacles:map.obstacles.map(r=>({x:r.x*W/720,y:r.y*H/480,w:r.w*W/720,h:r.h*H/480}))}));
   const icons = {
     pause:'<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>',
     home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M6 10v11h12V10M10 21v-7h4v7"/></svg>',
@@ -98,8 +99,9 @@
     for(const key of buckets(ax,ay,x,y)){if(!game.hash.has(key))game.hash.set(key,[]);game.hash.get(key).push(segment);}
     rider.trailX=x;rider.trailY=y;game.segmentCount++;
     trailCtx.lineCap='round';trailCtx.lineJoin='round';
-    trailCtx.strokeStyle=COLORS[rider.id]+'20';trailCtx.lineWidth=TRAIL+8;trailCtx.beginPath();trailCtx.moveTo(ax,ay);trailCtx.lineTo(x,y);trailCtx.stroke();
+    trailCtx.strokeStyle=COLORS[rider.id]+'20';trailCtx.lineWidth=TRAIL+12;trailCtx.beginPath();trailCtx.moveTo(ax,ay);trailCtx.lineTo(x,y);trailCtx.stroke();
     trailCtx.strokeStyle=COLORS[rider.id];trailCtx.lineWidth=TRAIL;trailCtx.beginPath();trailCtx.moveTo(ax,ay);trailCtx.lineTo(x,y);trailCtx.stroke();
+    trailCtx.strokeStyle='#efffff90';trailCtx.lineWidth=3;trailCtx.stroke();
   }
   function trailHit(rider,ax,ay,bx,by,padding=R+TRAIL/2){
     const visited=new Set();
@@ -109,7 +111,7 @@
       if(segmentDistance(ax,ay,bx,by,segment.ax,segment.ay,segment.bx,segment.by)<=padding)return true;
     }return false;
   }
-  function insetAt(time){return Math.max(0,(time-12)*5.25);}
+  function insetAt(time){return Math.max(0,(time-12)*5.25*H/480);}
   function wallHit(rider,ax,ay,bx,by,inset=game.inset){
     if(bx<R+inset||bx>W-R-inset||by<R+inset||by>H-R-inset)return true;
     return game.map.obstacles.some(rect=>segmentRect(ax,ay,bx,by,rect,R));
@@ -125,6 +127,7 @@
     clearInputs();game.round++;game.time=0;game.countdown=3;game.inset=0;game.phase='countdown';game.map=maps[(game.startMap+game.round-1)%maps.length];game.hash=new Map();game.segmentCount=0;game.space=null;game.spaceTime=-1;game.particles=[];game.ready.clear();game.winner=null;game.reason='';
     trailCtx.clearRect(0,0,W,H);
     game.riders=game.mode==='coop'?[makeRider(0,126,342,-.45,false,0),makeRider(1,126,138,.45,false,0),makeRider(2,594,138,Math.PI-.45,true,1),makeRider(3,594,342,Math.PI+.45,true,1)]:[makeRider(0,138,336,-.5,false,0),makeRider(1,582,144,Math.PI-.5,game.mode==='solo',1)];
+    for(const r of game.riders){r.x=r.trailX=r.x*W/720;r.y=r.trailY=r.y*H/480;}
     screen='playing';lastTime=performance.now();accumulator=0;updateHUD();audio('start');
   }
   function readInput(id){
@@ -137,11 +140,11 @@
   }
   function openSpace(){
     if(game.space&&game.time-game.spaceTime<.4)return game.space;
-    const size=16,cols=W/size,rows=H/size,labels=new Int16Array(cols*rows).fill(-1),areas=[];
+    const size=24,cols=W/size,rows=H/size,labels=new Int16Array(cols*rows).fill(-1),areas=[];
     const probe={id:-1,distance:0},inset=insetAt(game.time+2);
     for(let i=0;i<labels.length;i++){
       const x=(i%cols+.5)*size,y=(Math.floor(i/cols)+.5)*size;
-      if(!wallHit(probe,x,y,x,y,inset)&&!trailHit(probe,x,y,x,y,10))labels[i]=-2;
+      if(!wallHit(probe,x,y,x,y,inset)&&!trailHit(probe,x,y,x,y,R+TRAIL/2+4))labels[i]=-2;
     }
     for(let i=0;i<labels.length;i++)if(labels[i]===-2){
       const label=areas.length,queue=[i];labels[i]=label;
@@ -170,7 +173,7 @@
             const ahead=Math.min(arrival,.7),ox=other.x+Math.cos(other.angle)*other.speed*ahead,oy=other.y+Math.sin(other.angle)*other.speed*ahead;
             return Math.hypot(nx-other.x,ny-other.y)<18||Math.hypot(nx-ox,ny-oy)<22;
           });
-          if(wallHit(rider,x,y,nx,ny,futureInset)||trailHit(rider,x,y,nx,ny,9)||traffic)break;
+          if(wallHit(rider,x,y,nx,ny,futureInset)||trailHit(rider,x,y,nx,ny,R+TRAIL/2+2)||traffic)break;
           x=nx;y=ny;clear+=7;
         }
         const margin=Math.min(x-futureInset,W-futureInset-x,y-futureInset,H-futureInset-y);
@@ -265,9 +268,9 @@
     $('panels').replaceChildren();ui=[];
     for(let id=0;id<game.humanCount;id++){
       const panel=document.createElement('section');panel.className='player-panel';panel.style.setProperty('--player',COLORS[id]);panel.setAttribute('aria-label','Player '+(id+1)+' view');
-      panel.innerHTML='<header class="player-top"><span class="player-tag">P'+(id+1)+'</span><span class="round-label"></span><span class="score"></span></header><div class="player-status"></div><div class="pad" role="group" aria-label="Player '+(id+1)+' steering circle"><div class="knob"></div></div><div class="pad-label">CENTER TO STOP</div><div class="round-message" hidden><small></small><h2></h2><p></p></div><button class="ready" data-ui hidden>READY FOR NEXT ROUND</button>';
+      panel.innerHTML='<header class="player-top"><span class="player-tag">P'+(id+1)+'</span><span class="round-label"></span><span class="score"></span></header><div class="mini-map" role="img" aria-label="Player '+(id+1)+' minimap: whole arena, trails, particles and camera view"></div><div class="player-status"></div><div class="pad" role="group" aria-label="Player '+(id+1)+' steering circle"><div class="knob"></div></div><div class="pad-label">CENTER TO STOP</div><div class="round-message" hidden><small></small><h2></h2><p></p></div><button class="ready" data-ui hidden>READY FOR NEXT ROUND</button>';
       $('panels').append(panel);
-      const control={panel,pad:panel.querySelector('.pad'),knob:panel.querySelector('.knob'),caption:panel.querySelector('.pad-label'),round:panel.querySelector('.round-label'),score:panel.querySelector('.score'),status:panel.querySelector('.player-status'),message:panel.querySelector('.round-message'),ready:panel.querySelector('.ready')};ui.push(control);
+      const control={panel,header:panel.querySelector('.player-top'),minimap:panel.querySelector('.mini-map'),pad:panel.querySelector('.pad'),knob:panel.querySelector('.knob'),caption:panel.querySelector('.pad-label'),round:panel.querySelector('.round-label'),score:panel.querySelector('.score'),status:panel.querySelector('.player-status'),message:panel.querySelector('.round-message'),ready:panel.querySelector('.ready')};ui.push(control);
       control.pad.addEventListener('pointerdown',event=>{
         if((nativeTouch&&event.pointerType==='touch')||event.button!==0||screen!=='playing'||inputs[id].pointer!==null||inputs[id].touch!==null)return;
         event.preventDefault();inputs[id].pointer=event.pointerId;try{control.pad.setPointerCapture(event.pointerId);}catch(_){}movePad(id,event);
@@ -282,20 +285,42 @@
     return [0,1].map(id=>({cx:w*(id+.5)/2,cy:h/2,w:w/2,h,rotation:0,id}));
   }
   function boardFor(view){
-    const padSize=clamp(view.h*.245,70,120), top=46, bottom=padSize+40;
-    const scale=Math.min((view.w-30)/W,Math.max(55,view.h-top-bottom)/H);
-    const bw=W*scale,bh=H*scale,x=(view.w-bw)/2,y=top+(view.h-top-bottom-bh)*.35;
-    return {x,y,w:bw,h:bh,scale,padSize,padY:y+bh+21+padSize/2};
+    const padSize=clamp(Math.min(view.w,view.h)*.3,88,132);
+    // Keep the world larger than every viewport, including unusually wide screens.
+    const scale=Math.max(Math.min(view.w,view.h)/420,view.w/(W*.8),view.h/(H*.8));
+    return {x:0,y:0,w:view.w,h:view.h,scale,padSize,padX:view.w/2,padY:view.h/2};
+  }
+  function safeFor(view,safe){
+    const c=Math.cos(view.rotation),s=Math.sin(view.rotation),pw=Math.abs(c)*view.w+Math.abs(s)*view.h,ph=Math.abs(s)*view.w+Math.abs(c)*view.h;
+    const left=Math.max(view.cx-pw/2,safe.left),right=Math.min(view.cx+pw/2,safe.left+safe.width),top=Math.max(view.cy-ph/2,safe.top),bottom=Math.min(view.cy+ph/2,safe.top+safe.height);
+    const corners=[[left,top],[right,top],[right,bottom],[left,bottom]].map(([x,y])=>({x:(x-view.cx)*c+(y-view.cy)*s+view.w/2,y:-(x-view.cx)*s+(y-view.cy)*c+view.h/2}));
+    return {left:Math.max(0,Math.min(...corners.map(p=>p.x))),right:Math.max(0,view.w-Math.max(...corners.map(p=>p.x))),top:Math.max(0,Math.min(...corners.map(p=>p.y))),bottom:Math.max(0,view.h-Math.max(...corners.map(p=>p.y)))};
+  }
+  function cameraFor(view,rider){
+    const b=view.board||boardFor(view),w=view.w/b.scale,h=view.h/b.scale;
+    // Leave the particle above the centered thumb control; clamp at arena edges.
+    return {x:clamp(rider.x-w*.5,0,W-w),y:clamp(rider.y-h*.3,0,H-h),w,h,scale:b.scale};
+  }
+  function minimapFor(view){
+    const safe=view.safe||{top:0,right:0},w=clamp(Math.min(view.w,view.h)*.25,72,112);
+    return {x:view.w-safe.right-w-14,y:safe.top+(view.hudTop||12)+38,w,h:w*H/W};
+  }
+  function followedRider(id){
+    const own=game.riders[id];
+    return own.alive?own:game.riders.find(r=>r.alive&&r.team===own.team)||own;
   }
   function layout(){
     width=innerWidth;height=innerHeight;const dpr=Math.min(devicePixelRatio||1,1.75);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
     if(!game||screen==='menu'){drawPreview();return;}
     const safe=$('safe-frame').getBoundingClientRect();
-    views=makeViews(safe.width,safe.height,game.humanCount,game.faceToFace).map(v=>({...v,cx:v.cx+safe.left,cy:v.cy+safe.top}));
+    views=makeViews(width,height,game.humanCount,game.faceToFace);
     for(const view of views){const c=ui[view.id],b=boardFor(view);view.board=b;
+      view.safe=safeFor(view,safe);view.hudTop=game.humanCount===1?12:24;const m=minimapFor(view);
       Object.assign(c.panel.style,{left:view.cx+'px',top:view.cy+'px',width:view.w+'px',height:view.h+'px',transform:'translate(-50%,-50%) rotate('+view.rotation+'rad)'});
-      Object.assign(c.pad.style,{left:(view.w-b.padSize)/2+'px',top:b.padY-b.padSize/2+'px',width:b.padSize+'px',height:b.padSize+'px'});
-      c.caption.style.top=(b.padY+b.padSize/2+8)+'px';c.status.style.top=(b.y+b.h+8)+'px';c.message.style.top=(b.y+b.h/2)+'px';c.ready.style.top=b.padY+'px';
+      Object.assign(c.header.style,{left:(view.safe.left+14)+'px',right:(view.safe.right+14)+'px',top:(view.safe.top+view.hudTop)+'px'});
+      Object.assign(c.minimap.style,{left:m.x+'px',top:m.y+'px',width:m.w+'px',height:m.h+'px'});
+      Object.assign(c.pad.style,{left:b.padX-b.padSize/2+'px',top:b.padY-b.padSize/2+'px',width:b.padSize+'px',height:b.padSize+'px'});
+      c.caption.style.top=(b.padY+b.padSize/2+8)+'px';c.status.style.bottom=(view.safe.bottom+12)+'px';c.message.style.top=(view.h*.4)+'px';c.ready.style.top=(view.h*.76)+'px';
     }
     const bar=$('game-toolbar');Object.assign(bar.style,{left:(safe.left+(game.humanCount===1?safe.width-64:safe.width/2))+'px',top:(safe.top+(game.humanCount===1?safe.height-37:safe.height/2))+'px'});clearInputs();
   }
@@ -329,10 +354,12 @@
     c.lineWidth=2;c.strokeStyle=inset>0?'#dca66d':'#3c687a';c.strokeRect(inset,inset,Math.max(0,W-inset*2),Math.max(0,H-inset*2));
     if(inset>0){c.setLineDash([8,9]);c.lineDashOffset=-time*10;c.strokeStyle='#fff1cf80';c.lineWidth=1;c.strokeRect(inset+3,inset+3,Math.max(0,W-inset*2-6),Math.max(0,H-inset*2-6));c.setLineDash([]);}
   }
-  function drawRider(c,r,time){
-    if(!r.alive){c.strokeStyle=COLORS[r.id]+'90';c.lineWidth=2;c.beginPath();c.moveTo(r.x-7,r.y-7);c.lineTo(r.x+7,r.y+7);c.moveTo(r.x+7,r.y-7);c.lineTo(r.x-7,r.y+7);c.stroke();return;}
-    c.save();c.translate(r.x,r.y);c.rotate(r.angle);c.shadowColor=COLORS[r.id];c.shadowBlur=reducedMotion?4:13;c.fillStyle=COLORS[r.id];c.beginPath();c.moveTo(11,0);c.lineTo(3,-6);c.lineTo(-8,-5);c.lineTo(-8,5);c.lineTo(3,6);c.closePath();c.fill();c.shadowBlur=0;c.fillStyle='#eaffff';c.beginPath();c.moveTo(11,0);c.lineTo(4,-3);c.lineTo(4,3);c.closePath();c.fill();c.fillStyle='#07111d';rounded(c,-6,-3,7,6,1);c.fill();c.strokeStyle=COLORS[r.id];c.lineWidth=1.4;rounded(c,-6,-9,11,3,1);c.stroke();rounded(c,-6,6,11,3,1);c.stroke();c.restore();
-    if(r.speed<1){c.strokeStyle=COLORS[r.id]+'60';c.lineWidth=1;c.beginPath();c.arc(r.x,r.y,14,0,Math.PI*2);c.stroke();}
+  function drawRider(c,r){
+    c.save();c.globalAlpha=r.alive?1:.3;c.fillStyle=COLORS[r.id];
+    c.shadowColor=COLORS[r.id];c.shadowBlur=r.alive?(reducedMotion?7:20):0;
+    c.beginPath();c.arc(r.x,r.y,r.alive?R:3,0,Math.PI*2);c.fill();
+    if(r.alive){c.shadowBlur=0;c.fillStyle='#f4ffff';c.beginPath();c.arc(r.x,r.y,R*.45,0,Math.PI*2);c.fill();}
+    c.restore();
   }
   function drawWorld(c){
     drawGrid(c,game.map,game.time,game.inset);c.drawImage(trailCanvas,0,0);
@@ -341,20 +368,40 @@
     for(const r of game.riders){if(r.alive){c.strokeStyle=COLORS[r.id];c.lineWidth=TRAIL;c.lineCap='round';c.beginPath();c.moveTo(r.trailX,r.trailY);c.lineTo(r.x,r.y);c.stroke();}drawRider(c,r,game.time);}
     for(const p of game.particles){c.globalAlpha=clamp(p.life*2,0,1);c.fillStyle=p.color;c.fillRect(p.x-1.5,p.y-1.5,3,3);}c.globalAlpha=1;
   }
+  function drawMinimap(c,view,camera){
+    const m=minimapFor(view),sx=m.w/W,sy=m.h/H;
+    c.save();c.fillStyle='#06111cef';c.strokeStyle='#607e9166';c.lineWidth=1;
+    rounded(c,m.x-6,m.y-6,m.w+12,m.h+25,7);c.fill();c.stroke();
+    c.save();c.beginPath();c.rect(m.x,m.y,m.w,m.h);c.clip();
+    c.fillStyle='#102532';c.fillRect(m.x,m.y,m.w,m.h);
+    for(const o of game.map.obstacles){c.fillStyle='#486071';c.fillRect(m.x+o.x*sx,m.y+o.y*sy,o.w*sx,o.h*sy);}
+    c.drawImage(trailCanvas,m.x,m.y,m.w,m.h);
+    if(game.inset>0){const n=game.inset;c.fillStyle='#bd715b50';c.fillRect(m.x,m.y,m.w,n*sy);c.fillRect(m.x,m.y+m.h-n*sy,m.w,n*sy);c.fillRect(m.x,m.y+n*sy,n*sx,m.h-n*2*sy);c.fillRect(m.x+m.w-n*sx,m.y+n*sy,n*sx,m.h-n*2*sy);}
+    c.strokeStyle='#e7bd82';c.lineWidth=1;c.strokeRect(m.x+game.inset*sx,m.y+game.inset*sy,Math.max(0,W-game.inset*2)*sx,Math.max(0,H-game.inset*2)*sy);
+    c.fillStyle='#eafaff12';c.fillRect(m.x+camera.x*sx,m.y+camera.y*sy,camera.w*sx,camera.h*sy);
+    c.strokeStyle='#efffffbb';c.lineWidth=1;c.strokeRect(m.x+camera.x*sx,m.y+camera.y*sy,camera.w*sx,camera.h*sy);
+    for(const r of game.riders){if(!r.alive)continue;c.fillStyle=COLORS[r.id];c.beginPath();c.arc(m.x+r.x*sx,m.y+r.y*sy,r.id===view.id?3:2.5,0,Math.PI*2);c.fill();if(r.id===view.id){c.strokeStyle='#fff';c.lineWidth=1;c.stroke();}}
+    c.restore();c.fillStyle=COLORS[view.id];c.font='8px ui-monospace,monospace';c.textAlign='left';c.fillText('P'+(view.id+1)+' / RADAR',m.x,m.y+m.h+13);c.restore();
+  }
   function render(){
     ctx.fillStyle='#080f18';ctx.fillRect(0,0,width,height);
     if(screen==='menu'||!game){drawBackdrop();return;}
-    if(views.length===2){ctx.strokeStyle='#243644';ctx.lineWidth=1;ctx.beginPath();if(views[0].cx===views[1].cx){const y=(views[0].cy+views[1].cy)/2;ctx.moveTo(0,y);ctx.lineTo(width,y);}else{const x=(views[0].cx+views[1].cx)/2;ctx.moveTo(x,0);ctx.lineTo(x,height);}ctx.stroke();}
-    for(const v of views){const b=v.board;ctx.save();ctx.translate(v.cx,v.cy);ctx.rotate(v.rotation);ctx.translate(-v.w/2,-v.h/2);ctx.save();ctx.translate(b.x,b.y);ctx.scale(b.scale,b.scale);ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();drawWorld(ctx);ctx.restore();ctx.strokeStyle='#385363';ctx.lineWidth=1/b.scale;ctx.strokeRect(0,0,W,H);ctx.restore();
-      if(game.phase==='countdown'&&screen==='playing'){ctx.fillStyle='#08131cd9';rounded(ctx,v.w/2-42,b.y+b.h/2-42,84,84,16);ctx.fill();ctx.textAlign='center';ctx.fillStyle=COLORS[v.id];ctx.font='italic 800 52px system-ui';ctx.fillText(Math.max(1,Math.ceil(game.countdown)),v.w/2,b.y+b.h/2+18);}
+    for(const v of views){
+      const camera=cameraFor(v,followedRider(v.id));
+      ctx.save();ctx.translate(v.cx,v.cy);ctx.rotate(v.rotation);ctx.translate(-v.w/2,-v.h/2);
+      ctx.beginPath();ctx.rect(0,0,v.w,v.h);ctx.clip();
+      ctx.save();ctx.scale(camera.scale,camera.scale);ctx.translate(-camera.x,-camera.y);drawWorld(ctx);ctx.restore();
+      drawMinimap(ctx,v,camera);
+      if(game.phase==='countdown'&&screen==='playing'){const y=Math.max(72,v.h*.3);ctx.fillStyle='#08131cd9';rounded(ctx,v.w/2-32,y-32,64,64,14);ctx.fill();ctx.textAlign='center';ctx.fillStyle=COLORS[v.id];ctx.font='italic 800 42px system-ui';ctx.fillText(Math.max(1,Math.ceil(game.countdown)),v.w/2,y+15);}
       ctx.restore();
     }
+    if(views.length===2){ctx.strokeStyle='#526577';ctx.lineWidth=2;ctx.beginPath();if(views[0].cx===views[1].cx){const y=(views[0].cy+views[1].cy)/2;ctx.moveTo(0,y);ctx.lineTo(width,y);}else{const x=(views[0].cx+views[1].cx)/2;ctx.moveTo(x,0);ctx.lineTo(x,height);}ctx.stroke();}
   }
   function drawDemo(c,map,time){
     drawGrid(c,map);const paths=[[[38,440],[38,74],[180,74],[180,40],[560,40],[560,100],[640,100]],[[682,40],[682,406],[540,406],[540,444],[350,444],[350,356],[316,356]]];
-    for(let id=0;id<2;id++){const path=paths[id];c.lineJoin='round';c.lineCap='round';c.strokeStyle=COLORS[id]+'26';c.lineWidth=12;c.beginPath();path.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();c.strokeStyle=COLORS[id];c.lineWidth=4;c.stroke();const p=path[path.length-1],prev=path[path.length-2];drawRider(c,{id,x:p[0],y:p[1],angle:Math.atan2(p[1]-prev[1],p[0]-prev[0]),alive:true,speed:1},time);}
+    for(let id=0;id<2;id++){const path=paths[id].map(([x,y])=>[x*W/720,y*H/480]);c.lineJoin='round';c.lineCap='round';c.strokeStyle=COLORS[id]+'26';c.lineWidth=TRAIL+12;c.beginPath();path.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();c.strokeStyle=COLORS[id];c.lineWidth=TRAIL;c.stroke();const p=path[path.length-1],prev=path[path.length-2];drawRider(c,{id,x:p[0],y:p[1],angle:Math.atan2(p[1]-prev[1],p[0]-prev[0]),alive:true,speed:1},time);}
   }
-  function drawPreview(){const preview=$('arena-preview');if(!preview)return;const c=preview.getContext('2d');preview.width=720;preview.height=300;c.fillStyle='#09131f';c.fillRect(0,0,720,300);c.save();c.translate(135,0);c.scale(450/W,300/H);drawDemo(c,maps[selectedMap],0);c.restore();$('arena-name').textContent=maps[selectedMap].name;$('arena-detail').textContent=maps[selectedMap].detail;}
+  function drawPreview(){const preview=$('arena-preview');if(!preview)return;const c=preview.getContext('2d');preview.width=720;preview.height=300;c.fillStyle='#09131f';c.fillRect(0,0,720,300);c.save();const s=300/H;c.translate((720-W*s)/2,0);c.scale(s,s);drawDemo(c,maps[selectedMap],0);c.restore();$('arena-name').textContent=maps[selectedMap].name;$('arena-detail').textContent=maps[selectedMap].detail;}
   function drawBackdrop(){ctx.save();ctx.globalAlpha=.14;const s=Math.max(width/W,height/H)*1.2;ctx.translate(width*.5,height*.5);ctx.rotate(-.13);ctx.scale(s,s);ctx.translate(-W/2,-H/2);drawDemo(ctx,maps[selectedMap],0);ctx.restore();}
   function selectMode(mode){selectedMode=mode;for(const b of document.querySelectorAll('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));$('mode-description').textContent={solo:'Outlast a rival bot. First to three rounds wins.',duel:'Two ends of one phone. First to three rounds wins.',coop:'Two humans. Two bots. Leave your partner an escape.'}[mode];$('start-label').textContent={solo:'ENTER THE GRID',duel:'START THE DUEL',coop:'TAKE ON THE GRID'}[mode];$('tabletop-option').hidden=mode==='solo';$('solo-hint').hidden=mode!=='solo';document.querySelector('.difficulty').hidden=mode==='duel';$('setup-foot').textContent=mode==='solo'?'WASD OR ARROWS · OR DRAG THE CIRCLE':'ONE DEVICE · TWO CIRCLES · OPPOSITE ENDS';audio('tap');}
   function showToast(text){$('toast').textContent=text;$('toast').hidden=false;toastTime=performance.now()+2600;}

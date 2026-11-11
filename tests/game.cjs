@@ -23,7 +23,7 @@ function harness(touchSupport=true,seed=17){
   const seededMath=Object.create(Math);seededMath.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   const sandbox={document,window,Math:seededMath,innerWidth:390,innerHeight:844,devicePixelRatio:1,matchMedia(){return {matches:true}},localStorage:{getItem(){return null},setItem(){}},performance:{now(){return 0}},requestAnimationFrame(){},console};
   const source=original.replace('  boot();\n})();',`  boot();
-    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,insetAt,makeRider,makeViews,boardFor,
+    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,insetAt,makeRider,makeViews,boardFor,cameraFor,minimapFor,safeFor,followedRider,render,world:{w:W,h:H,r:R,trail:TRAIL},
       get game(){return game},get screen(){return screen},get ui(){return ui},get views(){return views},set screen(v){screen=v},
       simulate(seconds){for(let i=0;i<Math.ceil(seconds/STEP)&&screen==='playing';i++)step(STEP)}};
   })();`);
@@ -69,11 +69,42 @@ check('round readiness, arena rotation, first-to-three, and replay reset',()=>{
     if(round<3){assert.equal(t.game.round,round+1);assert.equal(t.game.map.name,['','The Divide','Cross Current'][round]);}
   }assert.equal(t.screen,'playing');assert.equal(t.game.round,1);assert.equal(t.game.scores[0],0);
 });
-check('portrait and landscape views face opposite ends and fit their panels',()=>{
-  const {t}=harness();for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768]]){
-    const views=t.makeViews(w,h,2,true);assert(Math.abs(Math.abs(views[0].rotation-views[1].rotation)-Math.PI)<1e-8);
-    for(const v of views){const b=t.boardFor(v);assert(b.x>=0&&b.y>=0);assert(b.y+b.h<b.padY-b.padSize/2);assert(b.padY+b.padSize/2<=v.h);}
+check('full-bleed views keep controls centered in portrait and landscape',()=>{
+  const {t,sandbox}=harness();for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768]])for(const mode of ['solo','duel','coop']){
+    sandbox.innerWidth=w;sandbox.innerHeight=h;t.start(mode);
+    if(mode!=='solo')assert(Math.abs(Math.abs(t.views[0].rotation-t.views[1].rotation)-Math.PI)<1e-8);
+    assert.equal(t.views.reduce((sum,v)=>sum+v.w*v.h,0),w*h);
+    for(const v of t.views){const b=v.board,pad=t.ui[v.id].pad;
+      assert.equal(b.x,0);assert.equal(b.y,0);assert.equal(b.w,v.w);assert.equal(b.h,v.h);
+      assert.equal(parseFloat(pad.style.left)+b.padSize/2,v.w/2);assert.equal(parseFloat(pad.style.top)+b.padSize/2,v.h/2);
+    }
   }
+});
+check('cameras follow independent particles through a larger world and clamp at edges',()=>{
+  const {t}=harness();assert(t.world.w>1000&&t.world.h>1000);
+  for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768],[2560,720]])for(const n of [1,2])for(const v of t.makeViews(w,h,n,true)){
+    v.board=t.boardFor(v);const center=t.cameraFor(v,{x:t.world.w/2,y:t.world.h/2});
+    assert(center.w<t.world.w&&center.h<t.world.h);
+    const moved=t.cameraFor(v,{x:t.world.w/2+20,y:t.world.h/2+20});assert(moved.x>center.x);assert(moved.y>=center.y);
+    for(const r of [{x:0,y:0},{x:t.world.w,y:t.world.h}]){const c=t.cameraFor(v,r);assert(c.x>=0&&c.y>=0);assert(c.x+c.w<=t.world.w+1e-8);assert(c.y+c.h<=t.world.h+1e-8);}
+    if(v.h/v.w<1.4){const particleY=(t.world.h/2-center.y)*center.scale;assert(particleY<v.board.padY-v.board.padSize/2,'particle sits above the thumb');}
+  }
+  t.start('duel');assert.notEqual(t.cameraFor(t.views[0],t.game.riders[0]).x,t.cameraFor(t.views[1],t.game.riders[1]).x);
+});
+check('each minimap fits its view and respects rotated phone safe areas',()=>{
+  const {t}=harness();for(const [w,h,safe] of [[390,844,{left:0,top:44,width:390,height:766}],[844,390,{left:44,top:0,width:766,height:390}]]){
+    for(const v of t.makeViews(w,h,2,true)){
+      v.safe=t.safeFor(v,safe);v.hudTop=24;const m=t.minimapFor(v);assert.equal(m.w/m.h,t.world.w/t.world.h);
+      const c=Math.cos(v.rotation),s=Math.sin(v.rotation);
+      for(const [x,y] of [[m.x,m.y],[m.x+m.w,m.y+m.h]]){const px=v.cx+(x-v.w/2)*c-(y-v.h/2)*s,py=v.cy+(x-v.w/2)*s+(y-v.h/2)*c;assert(px>=safe.left-1e-8&&px<=safe.left+safe.width+1e-8);assert(py>=safe.top-1e-8&&py<=safe.top+safe.height+1e-8);}
+    }
+  }
+});
+check('wide trails have matching collision width and co-op cameras follow survivors',()=>{
+  const {t}=harness();t.start('duel');const p=t.game.riders[1];p.trailX=500;p.trailY=400;p.distance=100;t.addTrail(p,700,400);
+  assert(t.trailHit(t.game.riders[0],550,412,600,412));assert(!t.trailHit(t.game.riders[0],550,415,600,415));
+  t.start('coop');assert.equal(t.followedRider(0).id,0);t.game.riders[0].alive=false;assert.equal(t.followedRider(0).id,1);
+  t.render();t.game.riders[1].alive=false;assert.equal(t.followedRider(0).id,0);t.render();
 });
 check('touch release outside pad resets only its own finger, including missing pointerup',()=>{
   const h=harness();const {t}=h;t.start('duel');const a=h.touch(0,t.ui[0].pad),b=h.touch(2,t.ui[1].pad,50,15);
