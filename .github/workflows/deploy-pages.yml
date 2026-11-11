@@ -1,0 +1,43 @@
+name: Test and deploy Neon Trails
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Test game and controls
+        run: node tests/game.cjs
+      - name: Prepare static page
+        run: |
+          mkdir -p _site
+          cp index.html _site/index.html
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload page
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy page
+        id: deployment
+        uses: actions/deploy-pages@v4
