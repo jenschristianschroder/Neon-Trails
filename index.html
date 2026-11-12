@@ -28,13 +28,13 @@
 <main class="menu" id="menu">
   <header class="topbar"><div class="brand"><span class="mark">/<i>/</i></span> AFTER HOURS ARCADE</div><div class="top-actions"><button class="icon-button" id="sound-menu" aria-label="Turn sound on"></button><button class="icon-button" id="help-open" aria-label="How to play">?</button></div></header>
   <div class="menu-grid">
-    <section class="intro"><div class="eyebrow">ONE FINGER. EVERY MOVE MATTERS.</div><h1>NEON<span>TRAILS.</span></h1><p class="lead">Draw your escape.</p><p class="description">Your path becomes a wall. Slow down, cut them off, and leave yourself a way out.</p><div class="control-lesson"><div class="mini-pad" aria-hidden="true"></div><div><strong>One circle. Complete control.</strong><span>DRAG TO DRIVE · CENTER TO STOP<br>LIFT YOUR FINGER TO RELEASE</span></div></div></section>
+    <section class="intro"><div class="eyebrow">ONE FINGER. EVERY MOVE MATTERS.</div><h1>NEON<span>TRAILS.</span></h1><p class="lead">Draw your escape.</p><p class="description">Keep moving. Cut them off. Chase pickups and slip through gaps as old trails disappear.</p><div class="control-lesson"><div class="mini-pad" aria-hidden="true"></div><div><strong>One circle. Complete control.</strong><span>DRAG TO DRIVE · CENTER TO CRUISE<br>LIFT TO CRUISE · PAUSE TO STOP</span></div></div></section>
     <section class="setup" aria-label="Set up a match"><p class="section-label">01 / PICK YOUR PLAY</p><div class="modes" role="group" aria-label="Game mode"><button class="mode" data-mode="solo" aria-pressed="true"><b>SOLO</b><small>YOU VS THE GRID</small></button><button class="mode" data-mode="duel" aria-pressed="false"><b>DUEL</b><small>SETTLE IT TOGETHER</small></button><button class="mode" data-mode="coop" aria-pressed="false"><b>CO-OP</b><small>TEAM UP. CUT OFF.</small></button></div><p class="mode-description" id="mode-description">Outlast a rival bot. First to three rounds wins.</p><p class="section-label">02 / CHOOSE YOUR GROUND</p><div class="arena-card"><canvas class="arena-preview" id="arena-preview" aria-label="Selected arena preview"></canvas><div class="arena-caption"><div><b id="arena-name">Open Circuit</b><small id="arena-detail">Room to think. Space to trap.</small></div><div class="arena-nav"><button id="map-prev" aria-label="Previous arena">‹</button><button id="map-next" aria-label="Next arena">›</button></div></div></div><div class="options"><div class="difficulty" role="group" aria-label="Bot difficulty"><button data-difficulty="easy" aria-pressed="false">CHILL</button><button data-difficulty="normal" aria-pressed="true">SHARP</button><button data-difficulty="hard" aria-pressed="false">RELENTLESS</button></div><label id="tabletop-option" hidden><input type="checkbox" id="tabletop" checked> FACE TO FACE</label><span id="solo-hint" style="font:9px var(--mono);color:#718da0">ONE PLAYER</span></div><button class="launch" id="start"><span id="start-label">ENTER THE GRID</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><p class="setup-foot" id="setup-foot">WASD OR ARROWS · OR DRAG THE CIRCLE</p></section>
-  </div><footer class="menu-footer"><span>STOP. DRAW. OUTLAST.</span><span>NEON TRAILS / VOL. 02</span></footer>
+  </div><footer class="menu-footer"><span>MOVE. DRAW. OUTLAST.</span><span>NEON TRAILS / VOL. 02</span></footer>
 </main>
 <div id="game" hidden><div id="panels"></div><div class="game-toolbar" id="game-toolbar" data-ui><button class="icon-button" id="pause-button" aria-label="Pause game"></button><button class="icon-button" id="sound-game" aria-label="Turn sound on"></button><button class="icon-button" id="fullscreen" aria-label="Toggle fullscreen"></button></div></div>
 <div class="overlay" id="pause" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title"><div class="eyebrow">THE GRID CAN WAIT.</div><h2 id="pause-title">Take a breath.</h2><p>Your round is paused. Place a fresh finger on the circle when you return.</p><button class="launch" id="resume">BACK TO THE GRID <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><button class="secondary" id="restart">Restart match</button><button class="secondary" id="home">Return to menu</button></section></div>
-<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = stop.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. You can stop as long as you like, but the boundary begins closing after 12 seconds. Keep an escape route toward the center.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your particle stays under your finger inside the circle as the larger arena scrolls around it. At the edge of the circle, it stays inside and moves at maximum speed. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
+<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = keep cruising.<br>Use pause to stop the game.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. Particles never stop during a round. Your trail has a limited length: its tail disappears as you move, reopening routes. The boundary only starts closing after 40 seconds. Keep an escape route toward the center.</p><p><b>Pickups affect whoever collects them.</b> L+ adds 180 to your trail; L- removes 180 (limits: 180–1100). S+ boosts speed by 35%; S- reduces it by 30% for 10 seconds. Speed effects replace each other; another pickup refreshes the timer. Pickups return after 5 seconds. Your trail and speed reset each round.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your particle stays under your finger inside the circle as the larger arena scrolls around it. At the edge of the circle, it stays inside and moves at maximum speed. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 (() => {
@@ -42,6 +42,8 @@
   const $ = id => document.getElementById(id);
   const canvas = $('scene'), ctx = canvas.getContext('2d', {alpha:false});
   const W = 1536, H = 1152, R = 7, TRAIL = 12, CELL = 32, STEP = 1/120, SPEED = 180;
+  const BASE_LENGTH=520, MIN_LENGTH=180, MAX_LENGTH=1100, CLOSE_AT=40;
+  const PICKUPS={long:{label:'LONGER TRAIL',icon:'L+',color:'#8ff0aa'},short:{label:'SHORTER TRAIL',icon:'L-',color:'#e1a0ff'},fast:{label:'SPEED UP',icon:'S+',color:'#ffe18b'},slow:{label:'SLOW DOWN',icon:'S-',color:'#82b8ff'}};
   const COLORS = ['#4ee9ef','#ff977e','#ba9aff','#f1cf7d'];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
   const angleDelta = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -96,13 +98,55 @@
   function buckets(ax,ay,bx,by,pad=0){const result=[];for(let y=Math.floor((Math.min(ay,by)-pad)/CELL);y<=Math.floor((Math.max(ay,by)+pad)/CELL);y++)for(let x=Math.floor((Math.min(ax,bx)-pad)/CELL);x<=Math.floor((Math.max(ax,bx)+pad)/CELL);x++)result.push(x+','+y);return result;}
   function addTrail(rider,x,y){
     const ax=rider.trailX,ay=rider.trailY;
-    const segment={ax,ay,bx:x,by:y,owner:rider.id,distance:rider.distance};
-    for(const key of buckets(ax,ay,x,y)){if(!game.hash.has(key))game.hash.set(key,[]);game.hash.get(key).push(segment);}
-    rider.trailX=x;rider.trailY=y;game.segmentCount++;
-    trailCtx.lineCap='round';trailCtx.lineJoin='round';
-    trailCtx.strokeStyle=COLORS[rider.id]+'20';trailCtx.lineWidth=TRAIL+12;trailCtx.beginPath();trailCtx.moveTo(ax,ay);trailCtx.lineTo(x,y);trailCtx.stroke();
-    trailCtx.strokeStyle=COLORS[rider.id];trailCtx.lineWidth=TRAIL;trailCtx.beginPath();trailCtx.moveTo(ax,ay);trailCtx.lineTo(x,y);trailCtx.stroke();
-    trailCtx.strokeStyle='#efffff90';trailCtx.lineWidth=3;trailCtx.stroke();
+    const segment={ax,ay,bx:x,by:y,owner:rider.id,distance:rider.distance,start:rider.distance-Math.hypot(x-ax,y-ay)};
+    segment.keys=buckets(ax,ay,x,y);
+    for(const key of segment.keys){if(!game.hash.has(key))game.hash.set(key,[]);game.hash.get(key).push(segment);}
+    rider.segments.push(segment);rider.trailX=x;rider.trailY=y;game.segmentCount++;game.trailsDirty=true;
+  }
+  function trimTrail(rider){
+    const cutoff=rider.distance-rider.trailLength;
+    while(rider.segments.length&&rider.segments[0].distance<=cutoff){
+      const old=rider.segments.shift();
+      for(const key of old.keys){const bucket=game.hash.get(key);if(!bucket)continue;const at=bucket.indexOf(old);if(at>=0)bucket.splice(at,1);if(!bucket.length)game.hash.delete(key);}
+      game.segmentCount--;game.trailsDirty=true;
+    }
+    const first=rider.segments[0];
+    if(first&&first.start<cutoff){const f=(cutoff-first.start)/(first.distance-first.start);first.ax+=(first.bx-first.ax)*f;first.ay+=(first.by-first.ay)*f;first.start=cutoff;game.trailsDirty=true;}
+  }
+  function refreshTrails(){
+    if(!game.trailsDirty)return;
+    trailCtx.clearRect(0,0,W,H);trailCtx.lineCap='round';trailCtx.lineJoin='round';
+    for(const r of game.riders){if(!r.segments.length)continue;
+      trailCtx.beginPath();trailCtx.moveTo(r.segments[0].ax,r.segments[0].ay);for(const seg of r.segments)trailCtx.lineTo(seg.bx,seg.by);
+      trailCtx.strokeStyle=COLORS[r.id]+'20';trailCtx.lineWidth=TRAIL+12;trailCtx.stroke();
+      trailCtx.strokeStyle=COLORS[r.id];trailCtx.lineWidth=TRAIL;trailCtx.stroke();
+      trailCtx.strokeStyle='#efffff90';trailCtx.lineWidth=3;trailCtx.stroke();
+    }game.trailsDirty=false;
+  }
+  function pickupSafe(x,y){
+    return !wallHit(null,x,y,x,y,game.inset+32)&&!game.map.obstacles.some(r=>segmentRect(x,y,x,y,r,28))&&!trailHit({id:-1,distance:0},x,y,x,y,24)&&game.riders.every(r=>!r.alive||Math.hypot(x-r.x,y-r.y)>60)&&game.pickups.every(p=>Math.hypot(x-p.x,y-p.y)>70);
+  }
+  function spawnPickup(type,preferred){
+    for(let i=0;i<80;i++){const n=game.inset+50,x=i===0&&preferred?preferred.x:n+Math.random()*(W-2*n),y=i===0&&preferred?preferred.y:n+Math.random()*(H-2*n);if(pickupSafe(x,y)){game.pickups.push({type,x,y});return true;}}
+    return false;
+  }
+  function seedPickups(){
+    game.pickups=[];game.pickupQueue=[];
+    const spots=[[.29,.64],[.26,.33],[.67,.73],[.56,.49]];
+    Object.keys(PICKUPS).forEach((type,i)=>{const [x,y]=spots[i];for(const flip of [false,true])if(!spawnPickup(type,{x:(flip?1-x:x)*W,y:(flip?1-y:y)*H}))game.pickupQueue.push({type,at:2});});
+  }
+  function applyPickup(r,type){
+    if(type==='long'||type==='short'){r.trailLength=clamp(r.trailLength+(type==='long'?180:-180),MIN_LENGTH,MAX_LENGTH);trimTrail(r);game.space=null;}
+    else {r.speedFactor=type==='fast'?1.35:.7;r.speedUntil=game.time+10;}
+    r.pickupNotice=PICKUPS[type].label;r.noticeUntil=game.time+2.5;audio('tap');
+  }
+  function updatePickups(proposals){
+    for(let i=game.pickups.length-1;i>=0;i--){const p=game.pickups[i];
+      const collectors=proposals.filter(m=>m.rider.alive&&distanceToSegment(p.x,p.y,m.ax,m.ay,m.x,m.y)<=R+15).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));
+      if(collectors.length){applyPickup(collectors[0].rider,p.type);game.pickups.splice(i,1);game.pickupQueue.push({type:p.type,at:game.time+5});}
+      else if(wallHit(null,p.x,p.y,p.x,p.y,game.inset+20)){game.pickups.splice(i,1);game.pickupQueue.push({type:p.type,at:game.time+1});}
+    }
+    for(let i=game.pickupQueue.length-1;i>=0;i--){const q=game.pickupQueue[i];if(game.time>=q.at){if(spawnPickup(q.type))game.pickupQueue.splice(i,1);else q.at=game.time+2;}}
   }
   function trailHit(rider,ax,ay,bx,by,padding=R+TRAIL/2){
     const visited=new Set();
@@ -112,12 +156,12 @@
       if(segmentDistance(ax,ay,bx,by,segment.ax,segment.ay,segment.bx,segment.by)<=padding)return true;
     }return false;
   }
-  function insetAt(time){return Math.max(0,(time-12)*5.25*H/480);}
+  function insetAt(time){return Math.max(0,(time-CLOSE_AT)*5.25*H/480);}
   function wallHit(rider,ax,ay,bx,by,inset=game.inset){
     if(bx<R+inset||bx>W-R-inset||by<R+inset||by>H-R-inset)return true;
     return game.map.obstacles.some(rect=>segmentRect(ax,ay,bx,by,rect,R));
   }
-  function makeRider(id,x,y,angle,bot,team){return {id,x,y,angle,bot,team,alive:true,trailX:x,trailY:y,distance:0,speed:0,aiTimer:0,aiAngle:angle,aiSpeed:1,crash:''};}
+  function makeRider(id,x,y,angle,bot,team){return {id,x,y,angle,bot,team,alive:true,trailX:x,trailY:y,distance:0,speed:0,segments:[],trailLength:BASE_LENGTH,speedFactor:1,speedUntil:0,pickupNotice:'',noticeUntil:0,aiTimer:0,aiAngle:angle,aiSpeed:1,crash:''};}
   function startMatch(){
     clearInputs();
     game={mode:selectedMode,startMap:selectedMap,faceToFace:selectedMode!=='solo'&&$('tabletop').checked,difficulty,scores:[0,0],round:0,humanCount:selectedMode==='solo'?1:2,particles:[],ready:new Set(),winner:null,matchEnded:false};
@@ -125,11 +169,11 @@
     buildPanels();startRound();layout();window.getSelection()?.removeAllRanges();
   }
   function startRound(){
-    clearInputs();game.round++;game.time=0;game.countdown=3;game.inset=0;game.phase='countdown';game.map=maps[(game.startMap+game.round-1)%maps.length];game.hash=new Map();game.segmentCount=0;game.space=null;game.spaceTime=-1;game.particles=[];game.ready.clear();game.winner=null;game.reason='';
+    clearInputs();game.round++;game.time=0;game.countdown=3;game.inset=0;game.phase='countdown';game.map=maps[(game.startMap+game.round-1)%maps.length];game.hash=new Map();game.segmentCount=0;game.trailsDirty=true;game.space=null;game.spaceTime=-1;game.particles=[];game.ready.clear();game.winner=null;game.reason='';
     trailCtx.clearRect(0,0,W,H);
     game.riders=game.mode==='coop'?[makeRider(0,126,342,-.45,false,0),makeRider(1,126,138,.45,false,0),makeRider(2,594,138,Math.PI-.45,true,1),makeRider(3,594,342,Math.PI+.45,true,1)]:[makeRider(0,138,336,-.5,false,0),makeRider(1,582,144,Math.PI-.5,game.mode==='solo',1)];
     for(const r of game.riders){r.x=r.trailX=r.x*W/720;r.y=r.trailY=r.y*H/480;}
-    screen='playing';lastTime=performance.now();accumulator=0;updateHUD();audio('start');
+    seedPickups();screen='playing';lastTime=performance.now();accumulator=0;updateHUD();audio('start');
   }
   function readInput(id){
     const input=inputs[id];let x=input.x,y=input.y;
@@ -184,7 +228,7 @@
         if(score>bestScore){bestScore=score;bestAngle=targetAngle;bestClear=clear;}
       }
       rider.aiAngle=bestAngle;
-      rider.aiSpeed=bestClear<7?0:bestClear<42?.4:game.difficulty==='easy'?.78:.94;
+      rider.aiSpeed=bestClear<42?0:game.difficulty==='easy'?.78:.94;
     }
     return {angle:rider.aiAngle,magnitude:rider.aiSpeed};
   }
@@ -207,16 +251,17 @@
     if(game.phase==='countdown'){game.countdown-=dt;if(game.countdown<=0){game.phase='live';audio('start');}return;}
     game.time+=dt;game.inset=insetAt(game.time);
     const proposals=[];
+    for(const r of game.riders){if(game.time>=r.speedUntil)r.speedFactor=1;trimTrail(r);}
     for(const rider of game.riders){
       if(!rider.alive)continue;
       const control=rider.bot?botControl(rider,dt):readInput(rider.id);
       const magnitude=control.magnitude;
-      const speed=SPEED*magnitude;
-      if(magnitude>.001){const target=rider.bot?control.angle:Math.atan2(control.y,control.x);rider.angle+=clamp(angleDelta(rider.angle,target),-speed/19*dt,speed/19*dt);}
+      const speed=SPEED*(.65+.35*magnitude)*rider.speedFactor;
+      if(rider.bot||magnitude>.001){const target=rider.bot?control.angle:Math.atan2(control.y,control.x);rider.angle+=clamp(angleDelta(rider.angle,target),-speed/19*dt,speed/19*dt);}
       rider.speed=speed;
       const x=rider.x+Math.cos(rider.angle)*speed*dt,y=rider.y+Math.sin(rider.angle)*speed*dt;
       let reason='';if(wallHit(rider,rider.x,rider.y,x,y))reason='The boundary or an obstacle caught you.';else if(trailHit(rider,rider.x,rider.y,x,y))reason='A trail cut off your route.';
-      proposals.push({rider,x,y,reason});
+      proposals.push({rider,ax:rider.x,ay:rider.y,x,y,reason});
     }
     // Resolve all riders against the same frame, so neither player moves first.
     for(let i=0;i<proposals.length;i++)for(let j=i+1;j<proposals.length;j++){
@@ -225,8 +270,9 @@
     }
     for(const move of proposals){const r=move.rider;r.distance+=Math.hypot(move.x-r.x,move.y-r.y);r.x=move.x;r.y=move.y;
       if(Math.hypot(r.x-r.trailX,r.y-r.trailY)>=2.5)addTrail(r,r.x,r.y);
-      if(move.reason)crash(r,move.reason);
+      trimTrail(r);if(move.reason)crash(r,move.reason);
     }
+    updatePickups(proposals);
     const aliveTeams=new Set(game.riders.filter(r=>r.alive).map(r=>r.team));
     if(aliveTeams.size<=1)finishRound(aliveTeams.size?[...aliveTeams][0]:null);
   }
@@ -270,7 +316,7 @@
     $('panels').replaceChildren();ui=[];
     for(let id=0;id<game.humanCount;id++){
       const panel=document.createElement('section');panel.className='player-panel';panel.style.setProperty('--player',COLORS[id]);panel.setAttribute('aria-label','Player '+(id+1)+' view');
-      panel.innerHTML='<header class="player-top"><span class="player-tag">P'+(id+1)+'</span><span class="round-label"></span><span class="score"></span></header><div class="mini-map" role="img" aria-label="Player '+(id+1)+' minimap: whole arena, trails, particles and camera view"></div><div class="player-status"></div><div class="pad" role="group" aria-label="Player '+(id+1)+' steering circle"><div class="knob"></div></div><div class="pad-label">CENTER TO STOP</div><div class="round-message" hidden><small></small><h2></h2><p></p></div><button class="ready" data-ui hidden>READY FOR NEXT ROUND</button>';
+      panel.innerHTML='<header class="player-top"><span class="player-tag">P'+(id+1)+'</span><span class="round-label"></span><span class="score"></span></header><div class="mini-map" role="img" aria-label="Player '+(id+1)+' minimap: whole arena, trails, particles and camera view"></div><div class="player-status"></div><div class="pad" role="group" aria-label="Player '+(id+1)+' steering circle"><div class="knob"></div></div><div class="pad-label">CENTER TO CRUISE</div><div class="round-message" hidden><small></small><h2></h2><p></p></div><button class="ready" data-ui hidden>READY FOR NEXT ROUND</button>';
       $('panels').append(panel);
       const control={panel,header:panel.querySelector('.player-top'),minimap:panel.querySelector('.mini-map'),pad:panel.querySelector('.pad'),knob:panel.querySelector('.knob'),caption:panel.querySelector('.pad-label'),round:panel.querySelector('.round-label'),score:panel.querySelector('.score'),status:panel.querySelector('.player-status'),message:panel.querySelector('.round-message'),ready:panel.querySelector('.ready')};ui.push(control);
       control.pad.addEventListener('pointerdown',event=>{
@@ -340,8 +386,8 @@
     if(pauseButton.dataset.home!==String(over)){pauseButton.dataset.home=String(over);pauseButton.innerHTML=icons[over?'home':'pause'];pauseButton.setAttribute('aria-label',over?'Return to menu':'Pause game');}
     for(let id=0;id<ui.length;id++){
       const c=ui[id],r=game.riders[id];c.round.textContent=game.map.name.toUpperCase()+' / R'+game.round;c.score.textContent=game.scores[0]+' : '+game.scores[1];
-      c.status.textContent=game.phase==='countdown'?'GET READY':!r.alive?'TRAIL ENDED · WATCH THE GRID':game.time<12?'FIELD CLOSES IN '+Math.ceil(12-game.time)+'s':'FIELD CLOSING · KEEP AN EXIT';
-      c.status.style.color=game.time>=12?'#e7bd82':'';c.pad.hidden=over||!r.alive;c.caption.hidden=over||!r.alive;c.message.hidden=!over;c.ready.hidden=!over;
+      c.status.textContent=game.phase==='countdown'?'GET READY · ALWAYS MOVING':!r.alive?'TRAIL ENDED · WATCH THE GRID':game.time<r.noticeUntil?r.pickupNotice+' · TRAIL '+r.trailLength:'TRAIL '+r.trailLength+' · '+(r.speedFactor!==1?(r.speedFactor>1?'BOOST ':'SLOW ')+Math.ceil(r.speedUntil-game.time)+'s · ':'')+(game.time<CLOSE_AT?'FIELD '+Math.ceil(CLOSE_AT-game.time)+'s':'FIELD CLOSING');
+      c.status.style.color=game.time>=CLOSE_AT?'#e7bd82':'';c.pad.hidden=over||!r.alive;c.caption.hidden=over||!r.alive;c.message.hidden=!over;c.ready.hidden=!over;
       if(over){
         const winner=game.matchEnded?game.matchWinner:game.winner,team=game.mode==='coop'?0:id;
         const won=winner===team,draw=winner===null;
@@ -374,6 +420,7 @@
     drawGrid(c,game.map,game.time,game.inset);c.drawImage(trailCanvas,0,0);
     // The closing field visibly covers old trails that are no longer drivable.
     if(game.inset>0){const n=game.inset;c.fillStyle='#080c17a8';c.fillRect(0,0,W,n);c.fillRect(0,H-n,W,n);c.fillRect(0,n,n,H-n*2);c.fillRect(W-n,n,n,H-n*2);}
+    for(const p of game.pickups){const item=PICKUPS[p.type];c.save();c.translate(p.x,p.y);c.fillStyle='#0b1925';c.strokeStyle=item.color;c.lineWidth=2;rounded(c,-15,-15,30,30,8);c.fill();c.stroke();c.fillStyle=item.color;c.font='bold 13px system-ui';c.textAlign='center';c.fillText(item.icon,0,5);c.restore();}
     for(const r of game.riders){if(r.alive){c.strokeStyle=COLORS[r.id];c.lineWidth=TRAIL;c.lineCap='round';c.beginPath();c.moveTo(r.trailX,r.trailY);c.lineTo(r.x,r.y);c.stroke();}drawRider(c,r,game.time);}
     for(const p of game.particles){c.globalAlpha=clamp(p.life*2,0,1);c.fillStyle=p.color;c.fillRect(p.x-1.5,p.y-1.5,3,3);}c.globalAlpha=1;
   }
@@ -385,6 +432,7 @@
     c.fillStyle='#102532';c.fillRect(m.x,m.y,m.w,m.h);
     for(const o of game.map.obstacles){c.fillStyle='#486071';c.fillRect(m.x+o.x*sx,m.y+o.y*sy,o.w*sx,o.h*sy);}
     c.drawImage(trailCanvas,m.x,m.y,m.w,m.h);
+    for(const p of game.pickups){c.fillStyle=PICKUPS[p.type].color;c.fillRect(m.x+p.x*sx-2,m.y+p.y*sy-2,4,4);}
     if(game.inset>0){const n=game.inset;c.fillStyle='#bd715b50';c.fillRect(m.x,m.y,m.w,n*sy);c.fillRect(m.x,m.y+m.h-n*sy,m.w,n*sy);c.fillRect(m.x,m.y+n*sy,n*sx,m.h-n*2*sy);c.fillRect(m.x+m.w-n*sx,m.y+n*sy,n*sx,m.h-n*2*sy);}
     c.strokeStyle='#e7bd82';c.lineWidth=1;c.strokeRect(m.x+game.inset*sx,m.y+game.inset*sy,Math.max(0,W-game.inset*2)*sx,Math.max(0,H-game.inset*2)*sy);
     c.fillStyle='#eafaff12';c.fillRect(m.x+camera.x*sx,m.y+camera.y*sy,camera.w*sx,camera.h*sy);
@@ -395,6 +443,7 @@
   function render(){
     ctx.fillStyle='#080f18';ctx.fillRect(0,0,width,height);
     if(screen==='menu'||!game){drawBackdrop();return;}
+    refreshTrails();
     for(const v of views){
       const camera=cameraFor(v,followedRider(v.id));
       ctx.save();ctx.translate(v.cx,v.cy);ctx.rotate(v.rotation);ctx.translate(-v.w/2,-v.h/2);

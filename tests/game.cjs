@@ -23,7 +23,7 @@ function harness(touchSupport=true,seed=17){
   const seededMath=Object.create(Math);seededMath.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   const sandbox={document,window,Math:seededMath,innerWidth:390,innerHeight:844,devicePixelRatio:1,matchMedia(){return {matches:true}},localStorage:{getItem(){return null},setItem(){}},performance:{now(){return 0}},requestAnimationFrame(){},console};
   const source=original.replace('  boot();\n})();',`  boot();
-    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,insetAt,makeRider,makeViews,boardFor,padTravel,cameraFor,minimapFor,safeFor,followedRider,render,world:{w:W,h:H,r:R,trail:TRAIL,speed:SPEED},
+    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,trimTrail,applyPickup,updatePickups,pickupSafe,insetAt,makeRider,makeViews,boardFor,padTravel,cameraFor,minimapFor,safeFor,followedRider,render,world:{w:W,h:H,r:R,trail:TRAIL,speed:SPEED},
       get game(){return game},get screen(){return screen},get ui(){return ui},get views(){return views},set screen(v){screen=v},
       simulate(seconds){for(let i=0;i<Math.ceil(seconds/STEP)&&screen==='playing';i++)step(STEP)}};
   })();`);
@@ -42,11 +42,31 @@ check('all modes and arenas start with safe spawns and appropriate teams',()=>{
     for(const r of t.game.riders)assert.equal(t.wallHit(r,r.x,r.y,r.x,r.y),false);
   }
 });
-check('neutral and released controls stop without adding trail',()=>{
-  const {t}=harness();t.start('duel');live(t);const p=t.game.riders[0];const x=p.x,y=p.y;
-  t.simulate(1);assert.equal(p.x,x);assert.equal(p.y,y);assert.equal(t.game.segmentCount,0);
-  t.inputs[0].x=1;t.simulate(.8);assert(p.distance>60);t.releaseInput(0);
-  const after={x:p.x,y:p.y,segments:t.game.segmentCount};t.simulate(.8);assert.equal(p.x,after.x);assert.equal(p.y,after.y);assert.equal(t.game.segmentCount,after.segments);
+check('neutral and released controls keep cruising and leave a trail',()=>{
+  const {t}=harness();t.start('duel');live(t);const p=t.game.riders[0];
+  t.simulate(1);assert(p.distance>110);assert(p.speed>0);assert(t.game.segmentCount>0);
+  t.inputs[0].x=1;t.simulate(.5);t.releaseInput(0);const before=p.distance,heading=p.angle;t.simulate(.5);
+  assert(p.distance>before+50);assert.equal(p.angle,heading);assert(p.speed>0);
+});
+check('old trail sections disappear from collision data, including partial segments',()=>{
+  const {t}=harness();t.start('duel');const p=t.game.riders[0],other=t.game.riders[1];p.trailX=200;p.trailY=500;p.distance=100;t.addTrail(p,300,500);p.distance=200;t.addTrail(p,400,500);
+  p.trailLength=120;t.trimTrail(p);assert(!t.trailHit(other,240,470,240,530));assert(t.trailHit(other,320,470,320,530));
+  p.distance=500;t.trimTrail(p);assert.equal(p.segments.length,0);assert.equal(t.game.hash.size,0);assert.equal(t.game.segmentCount,0);
+});
+check('length pickups are bounded and never resurrect an erased tail',()=>{
+  const {t}=harness();t.start('duel');const p=t.game.riders[0];for(let i=0;i<10;i++)t.applyPickup(p,'long');assert.equal(p.trailLength,1100);
+  for(let i=0;i<10;i++)t.applyPickup(p,'short');assert.equal(p.trailLength,180);t.applyPickup(p,'long');assert.equal(p.trailLength,360);assert.equal(p.segments.length,0);
+});
+check('pickups collect along movement, expire, respawn safely and reset each round',()=>{
+  const {t}=harness();t.start('duel');live(t);const r=t.game.riders[0];Object.assign(r,{x:300,y:500,trailX:300,trailY:500,angle:0});t.game.pickups=[{type:'fast',x:330,y:500}];t.game.pickupQueue=[];
+  t.simulate(.3);assert.equal(r.speedFactor,1.35);assert.equal(t.game.pickups.length,0);assert.equal(t.game.pickupQueue.length,1);
+  t.applyPickup(r,'slow');assert.equal(r.speedFactor,.7);assert.equal(r.speedUntil,t.game.time+10);
+  const until=r.speedUntil;t.game.time=until;t.step(1/120);assert.equal(r.speedFactor,1);assert(r.speed>0);assert.equal(t.game.pickupQueue.length,0);assert.equal(t.game.pickups.length,1);
+  const pickup=t.game.pickups[0];assert(!t.wallHit(r,pickup.x,pickup.y,pickup.x,pickup.y,t.game.inset+20));
+  t.applyPickup(r,'long');t.applyPickup(r,'fast');t.start('duel');assert.equal(t.game.riders[0].trailLength,520);assert.equal(t.game.riders[0].speedFactor,1);assert.equal(t.game.pickups.length,8);
+});
+check('every arena seeds all four pickup types clear of obstacles',()=>{
+  const {t}=harness();for(let map=0;map<3;map++){t.start('coop',map);assert.equal(t.game.pickups.length,8);assert.equal(new Set(t.game.pickups.map(p=>p.type)).size,4);for(const p of t.game.pickups)assert(!t.wallHit(null,p.x,p.y,p.x,p.y,32));}
 });
 check('continuous collision catches crossings and obstacles',()=>{
   const {t}=harness();assert.equal(t.segmentDistance(0,0,100,100,0,100,100,0),0);assert.equal(t.segmentDistance(0,0,100,0,30,4,50,4),4);
@@ -57,8 +77,8 @@ check('head-on and crossing riders receive a fair simultaneous draw',()=>{
   const {t}=harness();t.start('duel');live(t);Object.assign(t.game.riders[0],{x:350,y:240,trailX:350,trailY:240,angle:0});Object.assign(t.game.riders[1],{x:370,y:240,trailX:370,trailY:240,angle:Math.PI});t.inputs[0].x=1;t.inputs[1].x=-1;t.simulate(.1);
   assert.equal(t.screen,'roundover');assert.equal(t.game.winner,null);assert(t.game.riders.every(r=>!r.alive));assert.equal(t.game.scores[0]+t.game.scores[1],0);
 });
-check('the shrinking boundary ends a stationary duel',()=>{
-  const {t}=harness();t.start('duel');t.simulate(65);assert.equal(t.screen,'roundover');assert.equal(t.game.winner,null);assert(t.game.time<60);
+check('hands-off play cannot stall and the closing field is delayed',()=>{
+  const {t}=harness();t.start('duel');assert.equal(t.insetAt(39),0);assert(t.insetAt(41)>0);t.simulate(35);assert.notEqual(t.screen,'playing');assert(t.game.riders.every(r=>r.distance>0));assert(t.game.time<40);
 });
 check('co-op continues with one surviving teammate and ends when a team is eliminated',()=>{
   const {t}=harness();t.start('coop');live(t);t.game.riders[0].alive=false;t.step(1/120);assert.equal(t.screen,'playing');t.game.riders[2].alive=t.game.riders[3].alive=false;t.step(1/120);assert.equal(t.game.winner,0);assert.equal(t.game.scores[0],1);

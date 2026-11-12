@@ -8,17 +8,28 @@ A single-page, top-down neon trail game for phones, tablets, and desktop browser
 - **Duel** — two people on the same device, first to three round wins.
 - **Co-op** — two people against two bots. At least one teammate must survive.
 
-Drag the circular pad to move. Direction controls your heading, and distance from the center controls speed. Rest in the center or lift your finger to stop. Turns follow a small arc, so plan ahead instead of attempting an instant reverse.
+Drag the circular pad to move. Direction controls your heading, and distance from the center controls speed. Center or release to cruise straight at the minimum speed. Particles never stop during a live round; use Pause for a break. Turns follow a small arc, so plan ahead instead of attempting an instant reverse.
 
-Each player has an edge-to-edge view with a translucent control in its center. Your glowing particle sits directly under your touch, clamped inside the control circle. The world scrolls around it, even at arena edges, so it never drifts outside the control. Releasing returns it to the center and stops movement. Maximum speed is 180 world units per second (up from 119). Thick neon trails match their collision width.
+Each player has an edge-to-edge view with a translucent control in its center. Your glowing particle sits directly under your touch, clamped inside the control circle. The world scrolls around it, even at arena edges, so it never drifts outside the control. Releasing centers the particle and keeps it cruising. Normal speed ranges from 117 to 180 world units per second. Thick neon trails match their collision width.
 
-Each player's corner minimap shows the entire arena, obstacles, trails, living particles, the closing boundary, and that player's camera window. The map is larger than the main view in both directions. If a co-op player crashes, their camera follows the surviving teammate.
+Each player's corner minimap shows the entire arena, obstacles, trails, living particles, pickups, the closing boundary, and that player's camera window. The map is larger than the main view in both directions. If a co-op player crashes, their camera follows the surviving teammate.
 
-Your trail stays solid for the round. All trails, obstacles, riders, and the arena boundary are dangerous. The boundary begins closing after 12 seconds. Simultaneous crashes are draws. Arenas rotate between rounds. A match ends after three wins or nine total rounds, including draws.
+Trails start with a maximum length of 520 world units. Old sections disappear from both the display and collision detection, reopening routes. All trails, obstacles, riders, and the arena boundary are dangerous. The boundary begins closing after 40 seconds. Simultaneous crashes are draws. Arenas rotate between rounds. A match ends after three wins or nine total rounds, including draws.
 
 Face-to-face mode points the two complete views toward opposite ends of the phone, in portrait or landscape. Turn it off for keyboard play beside each other.
 
 Keyboard controls: P1 uses WASD, P2 uses arrow keys. Either set works in solo. Escape or P pauses. Sound is optional. The game automatically pauses when its page loses focus.
+
+## Pickups
+
+All four pickups affect whoever collects them, including bots:
+
+- **L+** adds 180 trail length, up to 1100.
+- **L-** removes 180 trail length, down to 180.
+- **S+** boosts speed by 35% for 10 seconds.
+- **S-** slows speed by 30% for 10 seconds, without stopping you.
+
+Speed effects replace one another and refresh the timer. Length changes last for the round; extending a trail cannot restore an already erased tail. Eight pickups start on each map, with collected pickups returning to a safe location after five seconds. Trail lengths and effects reset each round.
 
 ## Run locally
 
@@ -26,7 +37,7 @@ Open `index.html` in a modern browser. There are no dependencies, accounts, exte
 
 ## Verify
 
-Run `node tests/game.cjs` with Node.js. The suite checks collisions, draws, team survival, round progression, full-screen layouts, centered controls, camera movement and bounds, rotated safe areas, minimaps, stopping, multi-touch ownership, missed-release recovery, and interrupted input.
+Run `node tests/game.cjs` with Node.js. The suite checks collisions, draws, team survival, round progression, full-screen layouts, centered controls, camera movement and bounds, rotated safe areas, minimaps, continuous movement, finite trails, pickups, multi-touch ownership, missed-release recovery, and interrupted input.
 
 ## GitHub Pages
 
