@@ -19,6 +19,7 @@
 #safe-frame{position:fixed;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);pointer-events:none;visibility:hidden}
 @media(max-width:680px){.menu{padding-top:max(18px,env(safe-area-inset-top,0px))}}
 .player-panel{background:linear-gradient(#080f18b3,transparent 78px,transparent calc(100% - 44px),#080f18a8)}.player-top{filter:drop-shadow(0 1px 4px #000)}.pad{background:radial-gradient(circle,#0b202608,#08121d18);border-color:color-mix(in srgb,var(--player) 36%,transparent);box-shadow:none}.pad:before{border-color:color-mix(in srgb,var(--player) 18%,transparent)}.pad:after{background:transparent;border-color:#ffffff18}.pad.held{background:#08121d0a;box-shadow:0 0 24px color-mix(in srgb,var(--player) 7%,transparent)}.knob{background:color-mix(in srgb,var(--player) 12%,transparent);box-shadow:0 0 12px #08121d33}.pad-label{color:#a6c1cd90;text-shadow:0 1px 5px #000}.player-status{text-shadow:0 1px 5px #000}.mini-map{position:absolute;pointer-events:none}.round-message{z-index:3}.ready{z-index:4}
+.knob{visibility:hidden}
 </style>
 </head>
 <body>
@@ -33,14 +34,14 @@
 </main>
 <div id="game" hidden><div id="panels"></div><div class="game-toolbar" id="game-toolbar" data-ui><button class="icon-button" id="pause-button" aria-label="Pause game"></button><button class="icon-button" id="sound-game" aria-label="Turn sound on"></button><button class="icon-button" id="fullscreen" aria-label="Toggle fullscreen"></button></div></div>
 <div class="overlay" id="pause" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title"><div class="eyebrow">THE GRID CAN WAIT.</div><h2 id="pause-title">Take a breath.</h2><p>Your round is paused. Place a fresh finger on the circle when you return.</p><button class="launch" id="resume">BACK TO THE GRID <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><button class="secondary" id="restart">Restart match</button><button class="secondary" id="home">Return to menu</button></section></div>
-<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = stop.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. You can stop as long as you like, but the boundary begins closing after 12 seconds. Keep an escape route toward the center.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your camera follows your particle across a larger arena. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
+<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = stop.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. You can stop as long as you like, but the boundary begins closing after 12 seconds. Keep an escape route toward the center.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your particle stays under your finger inside the circle as the larger arena scrolls around it. At the edge of the circle, it stays inside and moves at maximum speed. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
   const canvas = $('scene'), ctx = canvas.getContext('2d', {alpha:false});
-  const W = 1536, H = 1152, R = 7, TRAIL = 12, CELL = 32, STEP = 1/120, SPEED = 119;
+  const W = 1536, H = 1152, R = 7, TRAIL = 12, CELL = 32, STEP = 1/120, SPEED = 180;
   const COLORS = ['#4ee9ef','#ff977e','#ba9aff','#f1cf7d'];
   const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
   const angleDelta = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -63,7 +64,7 @@
   let soundOn=false, audioContext, toastTime=0, helpReturn=null;
   try {soundOn=localStorage.getItem('neon-trails-sound')==='true';} catch (_) {}
   const keys=new Set();
-  const inputs=[0,1].map(()=>({x:0,y:0,touch:null,pointer:null}));
+  const inputs=[0,1].map(()=>({x:0,y:0,aimX:0,aimY:0,touch:null,pointer:null}));
   let trailCanvas=document.createElement('canvas'), trailCtx=trailCanvas.getContext('2d');
   trailCanvas.width=W;trailCanvas.height=H;
   function rounded(c,x,y,w,h,r=8){c.beginPath();c.roundRect(x,y,w,h,r);}
@@ -235,19 +236,20 @@
   }
   function releaseInput(id){
     const input=inputs[id],pointer=input.pointer,control=ui[id]?.pad;
-    input.x=input.y=0;input.touch=input.pointer=null;
+    input.x=input.y=input.aimX=input.aimY=0;input.touch=input.pointer=null;
     if(control){ui[id].knob.style.transform='';control.classList.remove('held');}
     if(pointer!==null&&control)try{if(control.hasPointerCapture(pointer))control.releasePointerCapture(pointer);}catch(_){}
   }
   function clearInputs(){keys.clear();for(let id=0;id<inputs.length;id++)releaseInput(id);}
   function movePad(id,point){
-    const controls=ui[id],bounds=controls.pad.getBoundingClientRect(),radius=bounds.width*.33;
+    const controls=ui[id],bounds=controls.pad.getBoundingClientRect(),radius=padTravel(views[id],bounds.width);
     const dx=(point.clientX-bounds.left-bounds.width/2)/radius,dy=(point.clientY-bounds.top-bounds.height/2)/radius;
     const rotation=views[id]?.rotation||0,c=Math.cos(rotation),s=Math.sin(rotation);
     let x=dx*c+dy*s,y=-dx*s+dy*c;const raw=Math.hypot(x,y),length=Math.min(1,raw);
     if(raw>0){x/=raw;y/=raw;}
     const magnitude=length<=.16?0:(length-.16)/.84;
     inputs[id].x=x*magnitude;inputs[id].y=y*magnitude;
+    inputs[id].aimX=x*length;inputs[id].aimY=y*length;
     controls.knob.style.transform='translate('+(x*length*radius)+'px,'+(y*length*radius)+'px)';
     controls.pad.classList.add('held');
   }
@@ -296,10 +298,17 @@
     const corners=[[left,top],[right,top],[right,bottom],[left,bottom]].map(([x,y])=>({x:(x-view.cx)*c+(y-view.cy)*s+view.w/2,y:-(x-view.cx)*s+(y-view.cy)*c+view.h/2}));
     return {left:Math.max(0,Math.min(...corners.map(p=>p.x))),right:Math.max(0,view.w-Math.max(...corners.map(p=>p.x))),top:Math.max(0,Math.min(...corners.map(p=>p.y))),bottom:Math.max(0,view.h-Math.max(...corners.map(p=>p.y)))};
   }
+  function padTravel(view,size){
+    const b=view.board||boardFor(view);
+    return Math.max(1,size/2-R*b.scale-2);
+  }
   function cameraFor(view,rider){
     const b=view.board||boardFor(view),w=view.w/b.scale,h=view.h/b.scale;
-    // Leave the particle above the centered thumb control; clamp at arena edges.
-    return {x:clamp(rider.x-w*.5,0,W-w),y:clamp(rider.y-h*.3,0,H-h),w,h,scale:b.scale};
+    const input=inputs[view.id],radius=padTravel(view,b.padSize);
+    const own=rider.id===view.id;
+    const ax=b.padX+(own?input.aimX*radius:0),ay=b.padY+(own?input.aimY*radius:0);
+    // Scroll the world, never the particle away from the finger, even at map edges.
+    return {x:rider.x-ax/b.scale,y:rider.y-ay/b.scale,w,h,scale:b.scale};
   }
   function minimapFor(view){
     const safe=view.safe||{top:0,right:0},w=clamp(Math.min(view.w,view.h)*.25,72,112);

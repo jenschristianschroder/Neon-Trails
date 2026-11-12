@@ -10,7 +10,7 @@ A single-page, top-down neon trail game for phones, tablets, and desktop browser
 
 Drag the circular pad to move. Direction controls your heading, and distance from the center controls speed. Rest in the center or lift your finger to stop. Turns follow a small arc, so plan ahead instead of attempting an instant reverse.
 
-Each player has an edge-to-edge view with a translucent control in its center. A separate camera follows each glowing particle through the 1536 × 1152 arena, keeping it above the control where possible so your thumb does not cover it. Cameras stop at the map edges. Thick neon trails match their collision width.
+Each player has an edge-to-edge view with a translucent control in its center. Your glowing particle sits directly under your touch, clamped inside the control circle. The world scrolls around it, even at arena edges, so it never drifts outside the control. Releasing returns it to the center and stops movement. Maximum speed is 180 world units per second (up from 119). Thick neon trails match their collision width.
 
 Each player's corner minimap shows the entire arena, obstacles, trails, living particles, the closing boundary, and that player's camera window. The map is larger than the main view in both directions. If a co-op player crashes, their camera follows the surviving teammate.
 

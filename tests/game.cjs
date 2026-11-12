@@ -23,14 +23,14 @@ function harness(touchSupport=true,seed=17){
   const seededMath=Object.create(Math);seededMath.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   const sandbox={document,window,Math:seededMath,innerWidth:390,innerHeight:844,devicePixelRatio:1,matchMedia(){return {matches:true}},localStorage:{getItem(){return null},setItem(){}},performance:{now(){return 0}},requestAnimationFrame(){},console};
   const source=original.replace('  boot();\n})();',`  boot();
-    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,insetAt,makeRider,makeViews,boardFor,cameraFor,minimapFor,safeFor,followedRider,render,world:{w:W,h:H,r:R,trail:TRAIL},
+    globalThis.test={start(mode='solo',map=0,level='normal'){selectedMode=mode;selectedMap=map;difficulty=level;startMatch()},step,inputs,keys,ready,pauseGame,resume,home,layout,releaseInput,clearInputs,segmentDistance,segmentRect,distanceToSegment,wallHit,trailHit,addTrail,insetAt,makeRider,makeViews,boardFor,padTravel,cameraFor,minimapFor,safeFor,followedRider,render,world:{w:W,h:H,r:R,trail:TRAIL,speed:SPEED},
       get game(){return game},get screen(){return screen},get ui(){return ui},get views(){return views},set screen(v){screen=v},
       simulate(seconds){for(let i=0;i<Math.ceil(seconds/STEP)&&screen==='playing';i++)step(STEP)}};
   })();`);
   assert.notEqual(source,original,'test seam exists');vm.createContext(sandbox);vm.runInContext(source,sandbox);
   const t=sandbox.test;
   function dispatch(type,target,props={}){const e={type,target:target||element(),button:0,buttons:1,pointerType:'touch',cancelable:true,preventDefault(){this.prevented=true},...props};documentEvents.get(type)?.fn(e);target?.listeners[type]?.(e);return e;}
-  function touch(id,target,x=85,y=50){return {identifier:id,target,clientX:x,clientY:y};}
+  function touch(id,target,x=99,y=50){return {identifier:id,target,clientX:x,clientY:y};}
   return {t,dispatch,touch,documentEvents,windowEvents,document,element,elements,sandbox};
 }
 function check(name,fn){fn();console.log('PASS '+name)}
@@ -80,16 +80,43 @@ check('full-bleed views keep controls centered in portrait and landscape',()=>{
     }
   }
 });
-check('cameras follow independent particles through a larger world and clamp at edges',()=>{
+check('cameras keep particles centered even at world edges',()=>{
   const {t}=harness();assert(t.world.w>1000&&t.world.h>1000);
   for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768],[2560,720]])for(const n of [1,2])for(const v of t.makeViews(w,h,n,true)){
     v.board=t.boardFor(v);const center=t.cameraFor(v,{x:t.world.w/2,y:t.world.h/2});
     assert(center.w<t.world.w&&center.h<t.world.h);
     const moved=t.cameraFor(v,{x:t.world.w/2+20,y:t.world.h/2+20});assert(moved.x>center.x);assert(moved.y>=center.y);
-    for(const r of [{x:0,y:0},{x:t.world.w,y:t.world.h}]){const c=t.cameraFor(v,r);assert(c.x>=0&&c.y>=0);assert(c.x+c.w<=t.world.w+1e-8);assert(c.y+c.h<=t.world.h+1e-8);}
-    if(v.h/v.w<1.4){const particleY=(t.world.h/2-center.y)*center.scale;assert(particleY<v.board.padY-v.board.padSize/2,'particle sits above the thumb');}
+    for(const r of [{x:0,y:0},{x:t.world.w,y:t.world.h}]){const c=t.cameraFor(v,r);assert(Math.abs((r.x-c.x)*c.scale-v.w/2)<1e-8);assert(Math.abs((r.y-c.y)*c.scale-v.h/2)<1e-8);}
   }
   t.start('duel');assert.notEqual(t.cameraFor(t.views[0],t.game.riders[0]).x,t.cameraFor(t.views[1],t.game.riders[1]).x);
+});
+check('particle tracks the actual touch within the circle in both orientations',()=>{
+  for(const [w,h] of [[390,844],[844,390]]){
+    const harn=harness();const {t,sandbox}=harn;sandbox.innerWidth=w;sandbox.innerHeight=h;t.start('duel');
+    for(const v of t.views){
+      const pad=t.ui[v.id].pad,b=v.board,size=b.padSize;
+      pad.getBoundingClientRect=()=>({left:0,top:0,width:size,height:size});
+      const r=t.game.riders[v.id];
+      for(const [dx,dy] of [[0,0],[2,1],[20,-12],[300,-200]]){
+        const finger=harn.touch(40+v.id,pad,size/2+dx,size/2+dy);
+        harn.dispatch('touchstart',pad,{touches:[finger],changedTouches:[finger]});
+        for(const [x,y] of [[r.x,r.y],[7,7],[t.world.w-7,t.world.h-7]]){
+          const c=t.cameraFor(v,{...r,x,y}),lx=(x-c.x)*c.scale-b.padX,ly=(y-c.y)*c.scale-b.padY;
+          const px=lx*Math.cos(v.rotation)-ly*Math.sin(v.rotation),py=lx*Math.sin(v.rotation)+ly*Math.cos(v.rotation);
+          const limit=t.padTravel(v,size),factor=Math.min(1,limit/(Math.hypot(dx,dy)||1));
+          assert(Math.abs(px-dx*factor)<1e-7);assert(Math.abs(py-dy*factor)<1e-7);
+          assert(Math.hypot(px,py)+t.world.r*c.scale<size/2);
+        }
+        harn.dispatch('touchend',pad,{touches:[],changedTouches:[finger]});
+        const c=t.cameraFor(v,r);assert(Math.abs((r.x-c.x)*c.scale-b.padX)<1e-7);assert.equal(t.inputs[v.id].aimX,0);
+      }
+    }
+  }
+});
+check('maximum speed increases while continuous collision still catches a wall',()=>{
+  const {t}=harness();t.start('duel');live(t);const r=t.game.riders[0];r.angle=0;t.inputs[0].x=1;
+  const before=r.x;t.simulate(.5);assert(Math.abs(r.x-before-90)<1e-5);assert.equal(r.speed,180);
+  Object.assign(r,{x:t.world.w-8,y:500,trailX:t.world.w-8,trailY:500});t.step(1/120);assert.equal(r.alive,false);
 });
 check('each minimap fits its view and respects rotated phone safe areas',()=>{
   const {t}=harness();for(const [w,h,safe] of [[390,844,{left:0,top:44,width:390,height:766}],[844,390,{left:44,top:0,width:766,height:390}]]){
@@ -107,8 +134,8 @@ check('wide trails have matching collision width and co-op cameras follow surviv
   t.render();t.game.riders[1].alive=false;assert.equal(t.followedRider(0).id,0);t.render();
 });
 check('touch release outside pad resets only its own finger, including missing pointerup',()=>{
-  const h=harness();const {t}=h;t.start('duel');const a=h.touch(0,t.ui[0].pad),b=h.touch(2,t.ui[1].pad,50,15);
-  h.dispatch('pointerdown',t.ui[0].pad,{pointerId:41,clientX:85,clientY:50});assert.equal(t.inputs[0].pointer,null);
+  const h=harness();const {t}=h;t.start('duel');const a=h.touch(0,t.ui[0].pad),b=h.touch(2,t.ui[1].pad,50,1);
+  h.dispatch('pointerdown',t.ui[0].pad,{pointerId:41,clientX:99,clientY:50});assert.equal(t.inputs[0].pointer,null);
   h.dispatch('touchstart',a.target,{touches:[a],changedTouches:[a]});h.dispatch('touchstart',b.target,{touches:[a,b],changedTouches:[b]});assert(t.inputs[0].x<-.99);assert(t.inputs[1].y<-.99);
   h.dispatch('touchend',h.element(),{touches:[b],changedTouches:[a]});assert.equal(t.inputs[0].x,0);assert.equal(t.ui[0].knob.style.transform,'');assert(t.inputs[1].y<-.99);
   h.dispatch('touchcancel',h.element(),{touches:[],changedTouches:[b]});assert.equal(t.inputs[1].y,0);
@@ -116,13 +143,13 @@ check('touch release outside pad resets only its own finger, including missing p
 check('dead zone, speed, face-to-face rotation, and missed-end recovery',()=>{
   const h=harness();const {t}=h;t.start('duel');const a=h.touch(1,t.ui[1].pad,52,50);h.dispatch('touchstart',a.target,{touches:[a],changedTouches:[a]});assert.equal(t.inputs[1].x,0);
   a.clientX=67;h.dispatch('touchmove',a.target,{touches:[a],changedTouches:[a]});assert(t.inputs[1].x>.2&&t.inputs[1].x<.6);
-  const b=h.touch(1,t.ui[0].pad,85,50);h.dispatch('touchstart',b.target,{touches:[b],changedTouches:[b]});assert.equal(t.inputs[1].x,0);assert(t.inputs[0].x<-.99);
+  const b=h.touch(1,t.ui[0].pad,99,50);h.dispatch('touchstart',b.target,{touches:[b],changedTouches:[b]});assert.equal(t.inputs[1].x,0);assert(t.inputs[0].x<-.99);
   t.pauseGame();t.resume();h.dispatch('touchmove',b.target,{touches:[b],changedTouches:[b]});assert.equal(t.inputs[0].x,0);
 });
 check('pointer fallback, failed capture, and releases outside controls',()=>{
   const h=harness(false);const {t}=h;t.start('solo');const pad=t.ui[0].pad;pad.captureFails=true;
-  h.dispatch('pointerdown',pad,{pointerId:9,pointerType:'mouse',clientX:85,clientY:50});assert(t.inputs[0].x>.99);
-  h.dispatch('pointermove',h.element(),{pointerId:9,pointerType:'mouse',clientX:15,clientY:50});assert(t.inputs[0].x<-.99);
+  h.dispatch('pointerdown',pad,{pointerId:9,pointerType:'mouse',clientX:99,clientY:50});assert(t.inputs[0].x>.99);
+  h.dispatch('pointermove',h.element(),{pointerId:9,pointerType:'mouse',clientX:1,clientY:50});assert(t.inputs[0].x<-.99);
   h.dispatch('pointerup',h.element(),{pointerId:9,buttons:0});assert.equal(t.inputs[0].x,0);
 });
 check('pause, visibility loss, blur and page exit clear input and freeze play',()=>{
