@@ -430,11 +430,14 @@
     if(r.alive){c.shadowBlur=0;c.fillStyle='#f4ffff';c.beginPath();c.arc(r.x,r.y,R*.45,0,Math.PI*2);c.fill();}
     c.restore();
   }
+  function drawPickup(c,p){
+    const item=PICKUPS[p.type];c.save();c.translate(p.x,p.y);c.fillStyle='#0b1925';c.strokeStyle=item.color;c.lineWidth=2;rounded(c,-15,-15,30,30,8);c.fill();c.stroke();c.fillStyle=item.color;c.font='bold 13px system-ui';c.textAlign='center';c.fillText(item.icon,0,5);c.restore();
+  }
   function drawWorld(c){
     drawGrid(c,game.map,game.time,game.inset);c.drawImage(trailCanvas,0,0);
     // The closing field visibly covers old trails that are no longer drivable.
     if(game.inset>0){const n=game.inset;c.fillStyle='#080c17a8';c.fillRect(0,0,W,n);c.fillRect(0,H-n,W,n);c.fillRect(0,n,n,H-n*2);c.fillRect(W-n,n,n,H-n*2);}
-    for(const p of game.pickups){const item=PICKUPS[p.type];c.save();c.translate(p.x,p.y);c.fillStyle='#0b1925';c.strokeStyle=item.color;c.lineWidth=2;rounded(c,-15,-15,30,30,8);c.fill();c.stroke();c.fillStyle=item.color;c.font='bold 13px system-ui';c.textAlign='center';c.fillText(item.icon,0,5);c.restore();}
+    for(const p of game.pickups)drawPickup(c,p);
     for(const r of game.riders){if(r.alive){c.strokeStyle=COLORS[r.id];c.lineWidth=TRAIL;c.lineCap='round';c.beginPath();c.moveTo(r.trailX,r.trailY);c.lineTo(r.x,r.y);c.stroke();}drawRider(c,r,game.time);}
     for(const p of game.particles){c.globalAlpha=clamp(p.life*2,0,1);c.fillStyle=p.color;c.fillRect(p.x-1.5,p.y-1.5,3,3);}c.globalAlpha=1;
   }
@@ -469,13 +472,33 @@
     }
     if(views.length===2){ctx.strokeStyle='#526577';ctx.lineWidth=2;ctx.beginPath();if(views[0].cx===views[1].cx){const y=(views[0].cy+views[1].cy)/2;ctx.moveTo(0,y);ctx.lineTo(width,y);}else{const x=(views[0].cx+views[1].cx)/2;ctx.moveTo(x,0);ctx.lineTo(x,height);}ctx.stroke();}
   }
-  function drawDemo(c,map,time){
-    drawGrid(c,map);const paths=[[[38,440],[38,74],[180,74],[180,40],[560,40],[560,100],[640,100]],[[682,40],[682,406],[540,406],[540,444],[350,444],[350,356],[316,356]]];
-    for(let id=0;id<2;id++){const path=paths[id].map(([x,y])=>[x*W/720,y*H/480]);c.lineJoin='round';c.lineCap='round';c.strokeStyle=COLORS[id]+'26';c.lineWidth=TRAIL+12;c.beginPath();path.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();c.strokeStyle=COLORS[id];c.lineWidth=TRAIL;c.stroke();const p=path[path.length-1],prev=path[path.length-2];drawRider(c,{id,x:p[0],y:p[1],angle:Math.atan2(p[1]-prev[1],p[0]-prev[0]),alive:true,speed:1},time);}
+  const demoRiders=[{id:0,x:350,y:700,alive:true},{id:1,x:300,y:550,alive:true}];
+  const demoPickups=[{type:'long',x:110,y:610},{type:'short',x:310,y:450},{type:'fast',x:450,y:660},{type:'slow',x:270,y:860}];
+  function drawDemo(c,map){
+    drawGrid(c,map);
+    // Short, curved trails with visible tails, using the actual gameplay palette.
+    for(const r of demoRiders){
+      c.save();c.lineJoin='round';c.lineCap='round';c.beginPath();
+      if(r.id===0){c.moveTo(140,910);c.lineTo(140,840);c.quadraticCurveTo(140,770,210,750);c.lineTo(r.x,r.y);}
+      else{c.moveTo(140,500);c.quadraticCurveTo(220,440,260,510);c.lineTo(r.x,r.y);}
+      c.strokeStyle=COLORS[r.id]+'26';c.lineWidth=TRAIL+12;c.stroke();c.strokeStyle=COLORS[r.id];c.lineWidth=TRAIL;c.stroke();c.strokeStyle='#efffff90';c.lineWidth=3;c.stroke();drawRider(c,r);c.restore();
+    }
+    for(const p of demoPickups)drawPickup(c,p);
   }
-  function drawPreview(){const preview=$('arena-preview');if(!preview)return;const c=preview.getContext('2d');preview.width=720;preview.height=300;c.fillStyle='#09131f';c.fillRect(0,0,720,300);c.save();const s=300/H;c.translate((720-W*s)/2,0);c.scale(s,s);drawDemo(c,maps[selectedMap],0);c.restore();$('arena-name').textContent=maps[selectedMap].name;$('arena-detail').textContent=maps[selectedMap].detail;}
+  function drawPreview(){
+    const preview=$('arena-preview');if(!preview)return;
+    const bounds=preview.getBoundingClientRect(),pw=Math.max(1,bounds.width),ph=Math.max(1,bounds.height),dpr=Math.min(devicePixelRatio||1,1.75);
+    preview.width=Math.round(pw*dpr);preview.height=Math.round(ph*dpr);const c=preview.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+    const scale=Math.max(pw/700,ph/420),camera={x:350-pw/scale/2,y:700-ph/scale/2,w:pw/scale,h:ph/scale};
+    c.fillStyle='#080f18';c.fillRect(0,0,pw,ph);c.save();c.scale(scale,scale);c.translate(-camera.x,-camera.y);drawDemo(c,maps[selectedMap]);c.restore();
+    const radius=Math.min(40,ph*.2);c.strokeStyle='#4ee9ef60';c.lineWidth=1;c.beginPath();c.arc(pw/2,ph/2,radius,0,Math.PI*2);c.stroke();c.setLineDash([2,3]);c.strokeStyle='#4ee9ef30';c.beginPath();c.arc(pw/2,ph/2,radius*.76,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    const mw=clamp(ph*.36,32,72),mh=mw*H/W,mx=pw-mw-9,my=9;
+    c.fillStyle='#06111cee';c.fillRect(mx-4,my-4,mw+8,mh+8);c.save();c.beginPath();c.rect(mx,my,mw,mh);c.clip();c.translate(mx,my);c.scale(mw/W,mh/H);drawDemo(c,maps[selectedMap]);c.fillStyle='#eafaff18';c.fillRect(camera.x,camera.y,camera.w,camera.h);c.strokeStyle='#eafaffaa';c.lineWidth=W/mw;c.strokeRect(camera.x,camera.y,camera.w,camera.h);c.restore();
+    if(ph>110){c.fillStyle='#afc9d5';c.font='9px ui-monospace,monospace';c.textAlign='left';c.fillText('FINITE TRAILS / PICKUPS',10,18);}
+    $('arena-name').textContent=maps[selectedMap].name;$('arena-detail').textContent=maps[selectedMap].detail;
+  }
   function drawBackdrop(){ctx.save();ctx.globalAlpha=.14;const s=Math.max(width/W,height/H)*1.2;ctx.translate(width*.5,height*.5);ctx.rotate(-.13);ctx.scale(s,s);ctx.translate(-W/2,-H/2);drawDemo(ctx,maps[selectedMap],0);ctx.restore();}
-  function selectMode(mode){selectedMode=mode;for(const b of document.querySelectorAll('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));$('mode-description').textContent={solo:'Outlast a rival bot. First to three rounds wins.',duel:'Two ends of one phone. First to three rounds wins.',coop:'Two humans. Two bots. Leave your partner an escape.'}[mode];$('start-label').textContent={solo:'ENTER THE GRID',duel:'START THE DUEL',coop:'TAKE ON THE GRID'}[mode];$('tabletop-option').hidden=mode==='solo';$('solo-hint').hidden=mode!=='solo';document.querySelector('.difficulty').hidden=mode==='duel';$('setup-foot').textContent=mode==='solo'?'WASD OR ARROWS · OR DRAG THE CIRCLE':'ONE DEVICE · TWO CIRCLES · OPPOSITE ENDS';audio('tap');}
+  function selectMode(mode){selectedMode=mode;for(const b of document.querySelectorAll('[data-mode]'))b.setAttribute('aria-pressed',String(b.dataset.mode===mode));$('mode-description').textContent={solo:'Outlast a rival bot. First to three rounds wins.',duel:'Two ends of one phone. First to three rounds wins.',coop:'Two humans. Two bots. Leave your partner an escape.'}[mode];$('start-label').textContent={solo:'ENTER THE GRID',duel:'START THE DUEL',coop:'TAKE ON THE GRID'}[mode];$('tabletop-option').hidden=mode==='solo';$('solo-hint').hidden=mode!=='solo';document.querySelector('.difficulty').hidden=mode==='duel';$('setup-foot').textContent=mode==='solo'?'WASD OR ARROWS · OR DRAG THE CIRCLE':'ONE DEVICE · TWO CIRCLES · OPPOSITE ENDS';drawPreview();audio('tap');}
   function showToast(text){$('toast').textContent=text;$('toast').hidden=false;toastTime=performance.now()+2600;}
   function bindInputs(){
     for(const type of ['pointerdown','pointerup','pointercancel','lostpointercapture'])document.addEventListener(type,releasePointer,true);
