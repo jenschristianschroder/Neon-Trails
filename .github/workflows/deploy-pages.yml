@@ -27,11 +27,13 @@ jobs:
         with:
           persist-credentials: false
       - name: Test game and controls
-        run: node tests/game.cjs
+        run: |
+          node tests/game.cjs
+          node tests/ambush.cjs
       - name: Prepare static page
         run: |
           mkdir -p _site
-          cp index.html _site/index.html
+          cp index.html ambush.html _site/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload page
