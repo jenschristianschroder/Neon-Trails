@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#080f18">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="description" content="Draw your escape. One-finger neon trail battles for solo, face-to-face duels, and local co-op.">
 <title>Neon Trails</title>
 <style>
@@ -34,6 +34,12 @@
 @media(max-height:500px) and (min-aspect-ratio:6/5){
  .menu-grid{display:grid;grid-template-columns:minmax(100px,.7fr) minmax(260px,1.3fr);gap:14px;align-items:center}.setup{height:100%;flex:none}.intro h1{font-size:clamp(28px,10dvh,48px);white-space:normal}.intro h1 span{display:block;margin:0}.intro .lead{font-size:12px}.brand{font-size:8px;letter-spacing:1px}.menu{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom))}
 }
+/* Keep menu controls below iOS browser/status-bar effects. Add breathing room
+   after the safe-area inset rather than using the inset as the entire padding. */
+.menu{padding-top:calc(env(safe-area-inset-top,0px) + 20px)}
+.topbar{position:relative;z-index:1;background:#080f18;border-radius:10px;min-height:44px}
+.topbar .brand{color:#eaf5f5}.topbar .icon-button{background:#162b39;border-color:#577080;color:#eaf5f5}
+@media(max-height:500px) and (min-aspect-ratio:6/5){.menu{padding-top:calc(env(safe-area-inset-top,0px) + 12px)}}
 </style>
 </head>
 <body>
