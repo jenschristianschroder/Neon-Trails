@@ -69,7 +69,7 @@
     const gen=++generation;
     // Allocate both host and guest IDs locally, avoiding a separate ID-service request.
     // LAN gameplay uses direct ICE candidates; no relay is configured for this mode.
-    const peerId=create?PREFIX+code:PREFIX+'guest-'+newCode()+newCode();
+    const peerId=PREFIX+(create?code:newCode());
     try{peer=new Peer(peerId,{debug:1,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});}catch{fail('This browser could not start multiplayer. Try a current Safari, Chrome or Firefox browser.');return;}
     peer.on('open',()=>{
       if(gen!==generation)return;
