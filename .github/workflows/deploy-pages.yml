@@ -30,10 +30,12 @@ jobs:
         run: |
           node tests/game.cjs
           node tests/ambush.cjs
+          node tests/wifi.cjs
+          node tests/wifi-session.cjs
       - name: Prepare static page
         run: |
           mkdir -p _site
-          cp index.html ambush.html _site/
+          cp index.html ambush.html wifi.html wifi.css wifi-core.js wifi.js _site/
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload page
@@ -43,3 +45,4 @@ jobs:
       - name: Deploy page
         id: deployment
         uses: actions/deploy-pages@v4
+

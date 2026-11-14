@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080f18">
+<title>Wi-Fi Arena · Neon Trails</title>
+<link rel="stylesheet" href="wifi.css">
+</head>
+<body>
+<main id="setup">
+  <header class="site-header"><a class="brand" href="index.html">↙ NEON TRAILS</a><span class="badge">EXPERIMENTAL</span></header>
+  <section class="intro"><p class="eyebrow">ONE NETWORK. TEN RIDERS.</p><h1>WI-FI <span>ARENA.</span></h1><p>Bring your own screen. Leave no escape.</p></section>
+  <section class="card" id="entry" aria-label="Create or join a Wi-Fi game">
+    <label for="name">YOUR NAME</label><input id="name" autocomplete="nickname" maxlength="16" placeholder="Neon rider">
+    <button class="primary" id="create">Create a room <span>2–10 PLAYERS ↗</span></button>
+    <div class="join-row"><div><label for="code">ROOM CODE</label><input id="code" autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="6" placeholder="ABC123"></div><button id="join">Join room</button></div>
+    <p class="connection-note">Connect to the same Wi-Fi. Internet is needed to load the game and create or join a room. Guest Wi-Fi that blocks connections between devices may not work.</p>
+  </section>
+  <section class="card" id="lobby" aria-label="Room lobby" hidden>
+    <div class="room-heading"><div><p class="eyebrow">ROOM CODE</p><strong id="room-code"></strong></div><button id="copy">Copy invite</button></div>
+    <div class="room-meta"><span id="player-count">1 / 10 players</span><span id="connection">Connected</span></div>
+    <ol id="roster" aria-label="Players in the room"></ol>
+    <button class="primary" id="ready" hidden>I'm ready</button><button class="primary" id="start" hidden disabled>Start match</button>
+    <p class="connection-note" id="lobby-hint">Keep this page open. The host starts once everyone is ready.</p><button class="quiet" id="leave">Leave room</button>
+  </section>
+  <p id="status" class="status" role="status" aria-live="polite">Create a room, or enter your host's six-character code.</p>
+  <button class="quiet" id="retry" hidden>Try again</button>
+  <p class="rules">LAST RIDER WINS · FIRST TO 3 ROUNDS<br>Finite trails · Four power-ups · No standing still</p>
+</main>
+<section id="game" aria-label="Wi-Fi Arena game" hidden>
+  <canvas id="arena" aria-label="Live arena with your particle, trails, pickups and minimap"></canvas>
+  <header class="game-header"><div><strong id="you"></strong><span id="round"></span></div><div><span id="alive"></span><button id="exit-game" aria-label="Leave multiplayer room">Exit</button></div></header>
+  <div class="game-notice" id="game-notice" role="status" aria-live="polite"></div>
+  <button id="spectate" hidden>Watch next rider</button>
+  <div id="pad" role="group" aria-label="Steering circle: drag to steer, release to cruise"><div id="knob"></div></div>
+  <p id="control-hint">DRAG TO STEER · RELEASE TO CRUISE</p><p id="rider-status"></p>
+  <button id="pause-game" hidden>Pause room</button>
+  <section id="result" class="result" aria-label="Round result" hidden><p class="eyebrow" id="result-label"></p><h2 id="result-title"></h2><ol id="scores"></ol><button class="primary" id="next" hidden>Next round</button><button class="primary" id="back-lobby" hidden>Back to lobby</button><p id="result-hint"></p></section>
+  <section id="paused" class="result" aria-label="Room paused" hidden><p class="eyebrow">ROOM PAUSED</p><h2>Take a breath.</h2><p>The host needs to keep this page open for everyone.</p><button class="primary" id="resume" hidden>Resume match</button><p id="pause-hint">Waiting for the host to resume.</p></section>
+</section>
+<div id="safe-frame" aria-hidden="true"></div>
+<script defer src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script defer src="wifi-core.js"></script>
+<script defer src="wifi.js"></script>
+</body>
+</html>
