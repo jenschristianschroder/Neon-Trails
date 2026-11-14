@@ -13,7 +13,7 @@ class Connection extends Events{
 }
 class Peer extends Events{
   constructor(id){super();this.id=typeof id==='string'?id:'guest-'+nextPeer++;this.connections=[];if(peers.has(this.id)){queue.push(()=>this.emit('error',{type:'unavailable-id'}));return;}peers.set(this.id,this);queue.push(()=>this.emit('open',this.id));}
-  connect(id,options){const c=new Connection(options.metadata),other=new Connection(options.metadata);c.other=other;other.other=c;this.connections.push(c);queue.push(()=>{const target=peers.get(id);if(!target){this.emit('error',{type:'peer-unavailable'});return;}target.connections.push(other);target.emit('connection',other);queue.push(()=>{c.open=other.open=true;c.emit('open');other.emit('open');});});return c;}
+  connect(id,options){assert.equal(options.serialization,'binary','large snapshots need chunked BinaryPack transport');const c=new Connection(options.metadata),other=new Connection(options.metadata);c.other=other;other.other=c;this.connections.push(c);queue.push(()=>{const target=peers.get(id);if(!target){this.emit('error',{type:'peer-unavailable'});return;}target.connections.push(other);target.emit('connection',other);queue.push(()=>{c.open=other.open=true;c.emit('open');other.emit('open');});});return c;}
   destroy(){if(peers.get(this.id)===this)peers.delete(this.id);for(const c of this.connections)c.close();}
 }
 function browser(name){

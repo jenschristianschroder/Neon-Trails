@@ -67,7 +67,10 @@
     if(typeof window.Peer!=='function'){status('The connection service could not load. Check your internet connection and reload.',true);$('retry').hidden=false;return;}
     isHost=create;roomCode=code;connectDeadline=performance.now()+25000;$('create').disabled=$('join').disabled=true;$('retry').hidden=true;status(create?'Creating your room…':'Finding room '+code+'…');
     const gen=++generation;
-    try{peer=create?new Peer(PREFIX+code,{debug:0}):new Peer({debug:0});}catch{fail('This browser could not start multiplayer. Try a current Safari, Chrome or Firefox browser.');return;}
+    // Allocate both host and guest IDs locally, avoiding a separate ID-service request.
+    // LAN gameplay uses direct ICE candidates; no relay is configured for this mode.
+    const peerId=create?PREFIX+code:PREFIX+'guest-'+newCode()+newCode();
+    try{peer=new Peer(peerId,{debug:1,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]}});}catch{fail('This browser could not start multiplayer. Try a current Safari, Chrome or Firefox browser.');return;}
     peer.on('open',()=>{
       if(gen!==generation)return;
       if(create){
@@ -75,7 +78,9 @@
         room=new N.HostRoom(name,{send:(key,m)=>send(connections.get(key),m),close:key=>{const c=connections.get(key);connections.delete(key);if(c)setTimeout(()=>c.close(),250);},changed:hostChanged});
         players=room.roster();paintLobby();keepAwake();
       }else{
-        link=peer.connect(PREFIX+code,{reliable:true,serialization:'json',metadata:{v:N.VERSION,name}});attachGuest(link,gen);
+        status('Connecting to the host…');
+        // BinaryPack chunks large ten-player snapshots; PeerJS JSON channels reject them.
+        link=peer.connect(PREFIX+code,{reliable:true,serialization:'binary',metadata:{v:N.VERSION,name}});attachGuest(link,gen);
       }
     });
     peer.on('connection',connection=>{
