@@ -19,7 +19,6 @@
 #safe-frame{position:fixed;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);pointer-events:none;visibility:hidden}
 @media(max-width:680px){.menu{padding-top:max(18px,env(safe-area-inset-top,0px))}}
 .player-panel{background:linear-gradient(#080f18b3,transparent 78px,transparent calc(100% - 44px),#080f18a8)}.player-top{filter:drop-shadow(0 1px 4px #000)}.pad{background:radial-gradient(circle,#0b202608,#08121d18);border-color:color-mix(in srgb,var(--player) 36%,transparent);box-shadow:none}.pad:before{border-color:color-mix(in srgb,var(--player) 18%,transparent)}.pad:after{background:transparent;border-color:#ffffff18}.pad.held{background:#08121d0a;box-shadow:0 0 24px color-mix(in srgb,var(--player) 7%,transparent)}.knob{background:color-mix(in srgb,var(--player) 12%,transparent);box-shadow:0 0 12px #08121d33}.pad-label{color:#a6c1cd90;text-shadow:0 1px 5px #000}.player-status{text-shadow:0 1px 5px #000}.mini-map{position:absolute;pointer-events:none}.round-message{z-index:3}.ready{z-index:4}
-.knob{visibility:hidden}
 
 /* Fit the menu to the visible screen, including mobile browser bars and notches. */
 .menu{height:100dvh;max-height:100%;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding: max(12px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
@@ -54,7 +53,7 @@
 </main>
 <div id="game" hidden><div id="panels"></div><div class="game-toolbar" id="game-toolbar" data-ui><button class="icon-button" id="pause-button" aria-label="Pause game"></button><button class="icon-button" id="sound-game" aria-label="Turn sound on"></button><button class="icon-button" id="fullscreen" aria-label="Toggle fullscreen"></button></div></div>
 <div class="overlay" id="pause" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="pause-title"><div class="eyebrow">THE GRID CAN WAIT.</div><h2 id="pause-title">Take a breath.</h2><p>Your round is paused. Place a fresh finger on the circle when you return.</p><button class="launch" id="resume">BACK TO THE GRID <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><button class="secondary" id="restart">Restart match</button><button class="secondary" id="home">Return to menu</button></section></div>
-<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = keep cruising.<br>Use pause to stop the game.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. Particles never stop during a round. Your trail has a limited length: its tail disappears as you move, reopening routes. The boundary only starts closing after 40 seconds. Keep an escape route toward the center.</p><p><b>Pickups affect whoever collects them.</b> L+ adds 180 to your trail; L- removes 180 (limits: 180–1100). S+ boosts speed by 35%; S- reduces it by 30% for 10 seconds. Speed effects replace each other; another pickup refreshes the timer. Pickups return after 5 seconds. Your trail and speed reset each round.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Your particle stays under your finger inside the circle as the larger arena scrolls around it. At the edge of the circle, it stays inside and moves at maximum speed. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates the views, centered controls and radar toward opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
+<div class="overlay" id="help" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="eyebrow">A LITTLE ROOM TO MANEUVER.</div><h2 id="help-title">Make your own way.</h2><p>Guide your glowing particle through the grid. Every line you leave is solid. Hit a trail, an obstacle, another rider, or the closing boundary and you're out.</p><div class="help-controls"><div><b>ONE FINGER</b><p>Touch the circle.<br>Drag toward your direction.<br>Farther out = faster.<br>Center or release = keep cruising.<br>Use pause to stop the game.</p></div><div><b>KEYBOARD</b><p>P1 · WASD<br>P2 · Arrow keys<br>Solo · either set<br>P or Escape · pause</p></div></div><p class="help-rules">Turns follow a small, smooth arc. Particles never stop during a round. Your trail has a limited length: its tail disappears as you move, reopening routes. The boundary only starts closing after 40 seconds. Keep an escape route toward the center.</p><p><b>Pickups affect whoever collects them.</b> L+ adds 180 to your trail; L- removes 180 (limits: 180–1100). S+ boosts speed by 35%; S- reduces it by 30% for 10 seconds. Speed effects replace each other; another pickup refreshes the timer. Pickups return after 5 seconds. Your trail and speed reset each round.</p><p>First team to three round wins. Simultaneous crashes are a draw. In co-op, at least one teammate must survive both bots. All trails are solid, including your teammate's.</p><p>Each view fills its half of the screen. Steer with the circle at the bottom of your view. Its thumb marker follows your finger while your particle stays visible above the controls as the larger arena scrolls around it. Drag to the edge of the circle for maximum speed. The corner radar shows the full map, every trail and your camera window. Face-to-face rotates each view and radar toward its player, keeping the steering circles near opposite ends of the phone. Turn it off for side-by-side keyboard play. Arenas rotate between rounds.</p><button class="launch" id="help-close">GOT IT. LET'S GO. <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button></section></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 (() => {
@@ -308,7 +307,7 @@
   }
   function clearInputs(){keys.clear();for(let id=0;id<inputs.length;id++)releaseInput(id);}
   function movePad(id,point){
-    const controls=ui[id],bounds=controls.pad.getBoundingClientRect(),radius=padTravel(views[id],bounds.width);
+    const controls=ui[id],bounds=controls.pad.getBoundingClientRect(),radius=padTravel(bounds.width);
     const dx=(point.clientX-bounds.left-bounds.width/2)/radius,dy=(point.clientY-bounds.top-bounds.height/2)/radius;
     const rotation=views[id]?.rotation||0,c=Math.cos(rotation),s=Math.sin(rotation);
     let x=dx*c+dy*s,y=-dx*s+dy*c;const raw=Math.hypot(x,y),length=Math.min(1,raw);
@@ -354,9 +353,11 @@
   }
   function boardFor(view){
     const padSize=clamp(Math.min(view.w,view.h)*.3,88,132);
+    const safe=view.safe||{top:0,right:0,bottom:0,left:0};
+    const padX=(view.w+safe.left-safe.right)/2,padY=view.h-safe.bottom-padSize/2-44;
     // Keep the world larger than every viewport, including unusually wide screens.
     const scale=Math.max(Math.min(view.w,view.h)/420,view.w/(W*.8),view.h/(H*.8));
-    return {x:0,y:0,w:view.w,h:view.h,scale,padSize,padX:view.w/2,padY:view.h/2};
+    return {x:0,y:0,w:view.w,h:view.h,scale,padSize,padX,padY,focusX:padX,focusY:(safe.top+padY-padSize/2)/2};
   }
   function safeFor(view,safe){
     const c=Math.cos(view.rotation),s=Math.sin(view.rotation),pw=Math.abs(c)*view.w+Math.abs(s)*view.h,ph=Math.abs(s)*view.w+Math.abs(c)*view.h;
@@ -364,17 +365,14 @@
     const corners=[[left,top],[right,top],[right,bottom],[left,bottom]].map(([x,y])=>({x:(x-view.cx)*c+(y-view.cy)*s+view.w/2,y:-(x-view.cx)*s+(y-view.cy)*c+view.h/2}));
     return {left:Math.max(0,Math.min(...corners.map(p=>p.x))),right:Math.max(0,view.w-Math.max(...corners.map(p=>p.x))),top:Math.max(0,Math.min(...corners.map(p=>p.y))),bottom:Math.max(0,view.h-Math.max(...corners.map(p=>p.y)))};
   }
-  function padTravel(view,size){
-    const b=view.board||boardFor(view);
-    return Math.max(1,size/2-R*b.scale-2);
+  function padTravel(size){
+    // The thumb marker is 34% of the circle; keep its whole edge inside the pad.
+    return Math.max(1,size*.33-2);
   }
   function cameraFor(view,rider){
     const b=view.board||boardFor(view),w=view.w/b.scale,h=view.h/b.scale;
-    const input=inputs[view.id],radius=padTravel(view,b.padSize);
-    const own=rider.id===view.id;
-    const ax=b.padX+(own?input.aimX*radius:0),ay=b.padY+(own?input.aimY*radius:0);
-    // Scroll the world, never the particle away from the finger, even at map edges.
-    return {x:rider.x-ax/b.scale,y:rider.y-ay/b.scale,w,h,scale:b.scale};
+    // Follow the particle above the controls, independently of the steering finger.
+    return {x:rider.x-b.focusX/b.scale,y:rider.y-b.focusY/b.scale,w,h,scale:b.scale};
   }
   function minimapFor(view){
     const safe=view.safe||{top:0,right:0},w=clamp(Math.min(view.w,view.h)*.25,72,112);
@@ -389,8 +387,9 @@
     if(!game||screen==='menu'){drawPreview();return;}
     const safe=$('safe-frame').getBoundingClientRect();
     views=makeViews(width,height,game.humanCount,game.faceToFace);
-    for(const view of views){const c=ui[view.id],b=boardFor(view);view.board=b;
-      view.safe=safeFor(view,safe);view.hudTop=game.humanCount===1?12:24;const m=minimapFor(view);
+    for(const view of views){
+      view.safe=safeFor(view,safe);view.hudTop=game.humanCount===1?12:24;
+      const c=ui[view.id],b=boardFor(view),m=minimapFor(view);view.board=b;
       Object.assign(c.panel.style,{left:view.cx+'px',top:view.cy+'px',width:view.w+'px',height:view.h+'px',transform:'translate(-50%,-50%) rotate('+view.rotation+'rad)'});
       Object.assign(c.header.style,{left:(view.safe.left+14)+'px',right:(view.safe.right+14)+'px',top:(view.safe.top+view.hudTop)+'px'});
       Object.assign(c.minimap.style,{left:m.x+'px',top:m.y+'px',width:m.w+'px',height:m.h+'px'});
@@ -495,9 +494,11 @@
     const preview=$('arena-preview');if(!preview)return;
     const bounds=preview.getBoundingClientRect(),pw=Math.max(1,bounds.width),ph=Math.max(1,bounds.height),dpr=Math.min(devicePixelRatio||1,1.75);
     preview.width=Math.round(pw*dpr);preview.height=Math.round(ph*dpr);const c=preview.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
-    const scale=Math.max(pw/700,ph/420),camera={x:350-pw/scale/2,y:700-ph/scale/2,w:pw/scale,h:ph/scale};
+    const radius=Math.min(40,ph*.2),padY=ph-radius-10,focusY=(padY-radius)/2;
+    const scale=Math.max(pw/700,ph/420),camera={x:350-pw/scale/2,y:700-focusY/scale,w:pw/scale,h:ph/scale};
     c.fillStyle='#080f18';c.fillRect(0,0,pw,ph);c.save();c.scale(scale,scale);c.translate(-camera.x,-camera.y);drawDemo(c,maps[selectedMap]);c.restore();
-    const radius=Math.min(40,ph*.2);c.strokeStyle='#4ee9ef60';c.lineWidth=1;c.beginPath();c.arc(pw/2,ph/2,radius,0,Math.PI*2);c.stroke();c.setLineDash([2,3]);c.strokeStyle='#4ee9ef30';c.beginPath();c.arc(pw/2,ph/2,radius*.76,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    c.strokeStyle='#4ee9ef60';c.lineWidth=1;c.beginPath();c.arc(pw/2,padY,radius,0,Math.PI*2);c.stroke();c.setLineDash([2,3]);c.strokeStyle='#4ee9ef30';c.beginPath();c.arc(pw/2,padY,radius*.76,0,Math.PI*2);c.stroke();c.setLineDash([]);
+    c.fillStyle='#4ee9ef22';c.strokeStyle='#4ee9efa0';c.beginPath();c.arc(pw/2,padY,radius*.34,0,Math.PI*2);c.fill();c.stroke();
     const mw=clamp(ph*.36,32,72),mh=mw*H/W,mx=pw-mw-9,my=9;
     c.fillStyle='#06111cee';c.fillRect(mx-4,my-4,mw+8,mh+8);c.save();c.beginPath();c.rect(mx,my,mw,mh);c.clip();c.translate(mx,my);c.scale(mw/W,mh/H);drawDemo(c,maps[selectedMap]);c.fillStyle='#eafaff18';c.fillRect(camera.x,camera.y,camera.w,camera.h);c.strokeStyle='#eafaffaa';c.lineWidth=W/mw;c.strokeRect(camera.x,camera.y,camera.w,camera.h);c.restore();
     if(ph>110){c.fillStyle='#afc9d5';c.font='9px ui-monospace,monospace';c.textAlign='left';c.fillText('FINITE TRAILS / PICKUPS',10,18);}

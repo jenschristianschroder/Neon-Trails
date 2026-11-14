@@ -89,28 +89,32 @@ check('round readiness, arena rotation, first-to-three, and replay reset',()=>{
     if(round<3){assert.equal(t.game.round,round+1);assert.equal(t.game.map.name,['','The Divide','Cross Current'][round]);}
   }assert.equal(t.screen,'playing');assert.equal(t.game.round,1);assert.equal(t.game.scores[0],0);
 });
-check('full-bleed views keep controls centered in portrait and landscape',()=>{
-  const {t,sandbox}=harness();for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768]])for(const mode of ['solo','duel','coop']){
-    sandbox.innerWidth=w;sandbox.innerHeight=h;t.start(mode);
-    if(mode!=='solo')assert(Math.abs(Math.abs(t.views[0].rotation-t.views[1].rotation)-Math.PI)<1e-8);
+check('full-bleed views keep controls at each player bottom in portrait and landscape',()=>{
+  const {t,sandbox,document}=harness();for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768]])for(const mode of ['solo','duel','coop'])for(const face of [true,false]){
+    sandbox.innerWidth=w;sandbox.innerHeight=h;document.getElementById('tabletop').checked=face;t.start(mode);
+    if(mode!=='solo'&&face)assert(Math.abs(Math.abs(t.views[0].rotation-t.views[1].rotation)-Math.PI)<1e-8);
     assert.equal(t.views.reduce((sum,v)=>sum+v.w*v.h,0),w*h);
     for(const v of t.views){const b=v.board,pad=t.ui[v.id].pad;
       assert.equal(b.x,0);assert.equal(b.y,0);assert.equal(b.w,v.w);assert.equal(b.h,v.h);
-      assert.equal(parseFloat(pad.style.left)+b.padSize/2,v.w/2);assert.equal(parseFloat(pad.style.top)+b.padSize/2,v.h/2);
+      assert.equal(parseFloat(pad.style.left)+b.padSize/2,v.w/2);
+      const top=parseFloat(pad.style.top),bottom=top+b.padSize;
+      assert(top>v.h/2);assert(bottom<=v.h-28&&bottom>=v.h-64);
+      assert(b.focusY+t.world.r*b.scale+20<top,'particle has clear space above the controls');
+      assert(parseFloat(t.ui[v.id].caption.style.top)>bottom);
     }
   }
 });
-check('cameras keep particles centered even at world edges',()=>{
+check('cameras keep particles above the controls even at world edges',()=>{
   const {t}=harness();assert(t.world.w>1000&&t.world.h>1000);
   for(const [w,h] of [[390,844],[844,390],[320,568],[1024,768],[2560,720]])for(const n of [1,2])for(const v of t.makeViews(w,h,n,true)){
     v.board=t.boardFor(v);const center=t.cameraFor(v,{x:t.world.w/2,y:t.world.h/2});
     assert(center.w<t.world.w&&center.h<t.world.h);
     const moved=t.cameraFor(v,{x:t.world.w/2+20,y:t.world.h/2+20});assert(moved.x>center.x);assert(moved.y>=center.y);
-    for(const r of [{x:0,y:0},{x:t.world.w,y:t.world.h}]){const c=t.cameraFor(v,r);assert(Math.abs((r.x-c.x)*c.scale-v.w/2)<1e-8);assert(Math.abs((r.y-c.y)*c.scale-v.h/2)<1e-8);}
+    for(const r of [{x:0,y:0},{x:t.world.w,y:t.world.h}]){const c=t.cameraFor(v,r);assert(Math.abs((r.x-c.x)*c.scale-v.w/2)<1e-8);assert(Math.abs((r.y-c.y)*c.scale-v.board.focusY)<1e-8);assert((r.y-c.y)*c.scale+t.world.r*c.scale<v.board.padY-v.board.padSize/2);}
   }
   t.start('duel');assert.notEqual(t.cameraFor(t.views[0],t.game.riders[0]).x,t.cameraFor(t.views[1],t.game.riders[1]).x);
 });
-check('particle tracks the actual touch within the circle in both orientations',()=>{
+check('thumb marker tracks and clamps touch while the particle stays clear in both orientations',()=>{
   for(const [w,h] of [[390,844],[844,390]]){
     const harn=harness();const {t,sandbox}=harn;sandbox.innerWidth=w;sandbox.innerHeight=h;t.start('duel');
     for(const v of t.views){
@@ -120,15 +124,19 @@ check('particle tracks the actual touch within the circle in both orientations',
       for(const [dx,dy] of [[0,0],[2,1],[20,-12],[300,-200]]){
         const finger=harn.touch(40+v.id,pad,size/2+dx,size/2+dy);
         harn.dispatch('touchstart',pad,{touches:[finger],changedTouches:[finger]});
+        const [lx,ly]=t.ui[v.id].knob.style.transform.match(/-?[\d.]+(?=px)/g).map(Number);
+        const px=lx*Math.cos(v.rotation)-ly*Math.sin(v.rotation),py=lx*Math.sin(v.rotation)+ly*Math.cos(v.rotation);
+        const limit=t.padTravel(size),factor=Math.min(1,limit/(Math.hypot(dx,dy)||1));
+        assert(Math.abs(px-dx*factor)<1e-7);assert(Math.abs(py-dy*factor)<1e-7);
+        assert(Math.hypot(px,py)+size*.17<size/2,'entire thumb marker stays inside the circle');
         for(const [x,y] of [[r.x,r.y],[7,7],[t.world.w-7,t.world.h-7]]){
-          const c=t.cameraFor(v,{...r,x,y}),lx=(x-c.x)*c.scale-b.padX,ly=(y-c.y)*c.scale-b.padY;
-          const px=lx*Math.cos(v.rotation)-ly*Math.sin(v.rotation),py=lx*Math.sin(v.rotation)+ly*Math.cos(v.rotation);
-          const limit=t.padTravel(v,size),factor=Math.min(1,limit/(Math.hypot(dx,dy)||1));
-          assert(Math.abs(px-dx*factor)<1e-7);assert(Math.abs(py-dy*factor)<1e-7);
-          assert(Math.hypot(px,py)+t.world.r*c.scale<size/2);
+          const c=t.cameraFor(v,{...r,x,y});
+          assert(Math.abs((x-c.x)*c.scale-b.focusX)<1e-7);assert(Math.abs((y-c.y)*c.scale-b.focusY)<1e-7);
+          assert((y-c.y)*c.scale+t.world.r*c.scale<b.padY-size/2-20);
         }
+        const heldCamera=t.cameraFor(v,r);
         harn.dispatch('touchend',pad,{touches:[],changedTouches:[finger]});
-        const c=t.cameraFor(v,r);assert(Math.abs((r.x-c.x)*c.scale-b.padX)<1e-7);assert.equal(t.inputs[v.id].aimX,0);
+        assert.deepEqual(t.cameraFor(v,r),heldCamera,'releasing the control must not move the camera');assert.equal(t.inputs[v.id].aimX,0);
       }
     }
   }
@@ -138,12 +146,14 @@ check('maximum speed increases while continuous collision still catches a wall',
   const before=r.x;t.simulate(.5);assert(Math.abs(r.x-before-90)<1e-5);assert.equal(r.speed,180);
   Object.assign(r,{x:t.world.w-8,y:500,trailX:t.world.w-8,trailY:500});t.step(1/120);assert.equal(r.alive,false);
 });
-check('each minimap fits its view and respects rotated phone safe areas',()=>{
-  const {t}=harness();for(const [w,h,safe] of [[390,844,{left:0,top:44,width:390,height:766}],[844,390,{left:44,top:0,width:766,height:390}]]){
-    for(const v of t.makeViews(w,h,2,true)){
-      v.safe=t.safeFor(v,safe);v.hudTop=24;const m=t.minimapFor(v);assert.equal(m.w/m.h,t.world.w/t.world.h);
+check('controls and minimaps fit inside rotated phone safe areas',()=>{
+  const {t}=harness();for(const [w,h,safe] of [[390,844,{left:0,top:44,width:390,height:766}],[844,390,{left:44,top:0,width:766,height:369}],[320,568,{left:0,top:20,width:320,height:528}]]){
+    for(const n of [1,2])for(const face of [true,false])for(const v of t.makeViews(w,h,n,face)){
+      v.safe=t.safeFor(v,safe);v.hudTop=24;const m=t.minimapFor(v),b=t.boardFor(v);assert.equal(m.w/m.h,t.world.w/t.world.h);
       const c=Math.cos(v.rotation),s=Math.sin(v.rotation);
-      for(const [x,y] of [[m.x,m.y],[m.x+m.w,m.y+m.h]]){const px=v.cx+(x-v.w/2)*c-(y-v.h/2)*s,py=v.cy+(x-v.w/2)*s+(y-v.h/2)*c;assert(px>=safe.left-1e-8&&px<=safe.left+safe.width+1e-8);assert(py>=safe.top-1e-8&&py<=safe.top+safe.height+1e-8);}
+      const half=b.padSize/2;
+      assert(b.padY>v.h/2);assert(b.focusY+t.world.r*b.scale+20<b.padY-half);
+      for(const [x,y] of [[m.x,m.y],[m.x+m.w,m.y+m.h],[b.padX-half,b.padY-half],[b.padX+half,b.padY+half]]){const px=v.cx+(x-v.w/2)*c-(y-v.h/2)*s,py=v.cy+(x-v.w/2)*s+(y-v.h/2)*c;assert(px>=safe.left-1e-8&&px<=safe.left+safe.width+1e-8);assert(py>=safe.top-1e-8&&py<=safe.top+safe.height+1e-8);}
     }
   }
 });
