@@ -21,6 +21,12 @@ Face-to-face mode points the two complete views toward opposite ends of the phon
 
 Keyboard controls: P1 uses WASD, P2 uses arrow keys. Either set works in solo. Escape or P pauses. Sound is optional. The game automatically pauses when its page loses focus.
 
+## Share and add to Home Screen
+
+Tap **SHARE** in the main menu to show a QR code for the public game URL, framed with cyan and coral trails. Use **Copy link**, or **Share game** when the browser supports native sharing. The QR is a local vector asset with high error correction, a clear four-module quiet zone, and dark modules on a light background; it needs no external QR service. It always opens the main game, without room codes or preview URLs.
+
+The panel includes **Add to Home Screen** instructions for Safari on iPhone/iPad and Chrome on Android, plus a native install button when the browser offers installation. The web manifest and matching neon icons support standalone launch. This does not add offline caching; an internet connection is still needed to load the hosted game. If the public game URL changes, update both `share-url` in `index.html` and `assets/neon-qr.svg`.
+
 ## Wi-Fi Arena
 
 Open **Wi-Fi Arena** from the main menu, or open `wifi.html` directly:
@@ -66,3 +72,4 @@ The included workflow runs all four test suites and deploys the game pages and W
 Canvas 2D, a fixed 120 Hz simulation, cached trail rendering, spatially indexed line collisions, and a small open-space map for bots. Touches are tracked independently from mouse/pen pointers. No inactivity timeout is used for held controls. Release, cancellation, page exit, focus loss, and resizing clear the relevant input.
 
 Browser and simulated touch testing cannot replace testing on physical phones. In particular, verify simultaneous thumbs and browser-edge gestures on the devices used for local multiplayer.
+

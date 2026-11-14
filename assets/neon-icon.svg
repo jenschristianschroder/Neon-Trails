@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Neon Trails</title>
+  <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter><pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#18313e" stroke-width="1"/></pattern></defs>
+  <path fill="#080f18" d="M0 0h512v512H0z"/>
+  <path fill="url(#grid)" d="M0 0h512v512H0z"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
+    <g filter="url(#glow)"><path d="M150 352V156h64l84 196h64V220" stroke="#4ee9ef"/><path d="M290 156h72v28" stroke="#ff977e"/></g>
+    <path d="M150 352V156h64l84 196h64V220" stroke="#4ee9ef"/>
+    <path d="M290 156h72v28" stroke="#ff977e"/>
+  </g>
+  <circle cx="362" cy="220" r="13" fill="#ebffff"/>
+  <circle cx="362" cy="184" r="12" fill="#fff1e9"/>
+</svg>

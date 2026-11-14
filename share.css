@@ -1,0 +1,36 @@
+/* The share panel scrolls independently; the game menu keeps its fixed layout. */
+.topbar .share-open{width:auto;min-width:44px;min-height:40px;display:flex;justify-content:center;gap:7px;padding:0 10px;color:var(--cyan);border-color:#39737b}
+.share-open span{font:700 9px var(--mono);letter-spacing:1px}
+.share-modal{width:420px;max-width:calc(100vw - 24px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);margin:auto;padding:22px;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;border:1px solid #365966;border-radius:22px;background:radial-gradient(ellipse at 0 0,#12353c70,transparent 55%),#0b1722;color:var(--ink);box-shadow:0 24px 100px #000a}
+.share-modal::backdrop{background:#030911dc;backdrop-filter:blur(10px)}
+.share-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.share-heading .eyebrow{font-size:9px;letter-spacing:2px}
+.share-heading .icon-button{width:36px;height:36px;flex-shrink:0}
+.share-modal h2{font-size:32px;font-style:italic;font-weight:900;line-height:1.06;letter-spacing:-1.2px;margin:10px 0}
+.share-modal h2 span{color:var(--cyan)}
+.share-modal>p{margin:0;color:#9db6c4;font-size:12px;line-height:1.5}
+.share-qr{display:block;width:min(100%,300px);height:auto;margin:10px auto 12px}
+.share-url-label{display:block;margin-bottom:7px;color:#85a8b8;font:8px var(--mono);letter-spacing:1.4px}
+.share-url{display:block;width:100%;min-width:0;border:1px solid #304b5c;border-radius:8px;padding:11px 10px;background:#07121d;color:#b8d8df;font:10px var(--mono);text-overflow:ellipsis}
+.share-actions{display:flex;gap:8px;margin-top:10px}
+.share-actions button{min-height:44px;flex:1;width:auto;margin:0;padding:12px;font-size:12px}
+.share-actions .launch{gap:8px}
+.share-actions .launch span{font-size:12px}
+.share-modal .share-status{min-height:24px;padding-top:6px;color:#a3e5de;font-size:11px}
+.share-install{border-top:1px solid #274452;padding-top:14px;margin-top:4px}
+.share-install-heading{display:flex;align-items:center;gap:12px}
+.share-install-heading>svg{width:25px;height:30px;fill:none;stroke:var(--coral);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.share-install h3{font-size:14px;letter-spacing:-.2px;margin:0 0 4px}
+.share-install p{font-size:11px;line-height:1.7;color:#9db6c4;margin:0}
+.share-install details{margin-top:10px}
+.share-install summary{display:flex;align-items:center;justify-content:space-between;padding:10px 0;min-height:40px;cursor:pointer;font-size:11px;color:#c0d8df;list-style:none}
+.share-install summary::-webkit-details-marker{display:none}
+.share-install summary span{color:var(--cyan);font-size:18px}
+.share-install details[open] summary span{transform:rotate(45deg)}
+.share-install summary:focus-visible{outline:2px solid white;outline-offset:3px}
+.share-install-steps{display:grid;gap:12px;padding:4px 0 6px}
+.share-install-steps strong{display:block;margin-bottom:3px;font-size:11px;color:var(--cyan)}
+.share-install-steps b{font-weight:600;color:#d2e6ec}
+.share-install .share-installed{margin-top:10px;color:var(--cyan)}
+@media(max-width:500px){.topbar .brand-name{display:none}.topbar .brand{gap:0}.topbar .top-actions{gap:6px}.topbar .share-open{min-height:34px;padding:0 9px}.share-modal{padding:18px}.share-modal h2{font-size:29px}}
+@media(max-height:700px){.share-qr{width:min(100%,250px)}.share-modal h2{font-size:27px}.share-modal{padding:16px}.share-heading .icon-button{width:34px;height:34px}}
